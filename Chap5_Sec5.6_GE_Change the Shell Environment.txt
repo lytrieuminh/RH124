@@ -1,0 +1,45 @@
+#🤓 Guided Exercise: Change the Shell Environment
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start edit-bashconfig
+
+
+1. Change the student user's PS1 shell variable to [\u@\h \t \w]$ (remember to put the value of PS1 in quotation marks and to include a trailing space after the dollar sign). This change adds the time to the prompt.
+    1.1 Use the ssh command to log in to servera as the student user.
+    [student@workstation ~]$ ssh student@servera
+
+    1.2 Use Vim to edit the ~/.bashrc configuration file.
+    [student@servera ~]$ vim ~/.bashrc
+
+    1.3 Add the PS1 shell variable and its value to the ~/.bashrc file.
+    Set the value of the shell variable, including a trailing space at the end, inside quotation marks.
+    ...output omitted...
+    export PATH
+    PS1='[\u@\h \t \w]$ '
+
+    1.4 Exit from servera and log in again by using the ssh command to update the command prompt, or execute the ~/.bashrc file by using the source ~/.bashrc command.
+    [student@servera ~]$ exit
+
+2. Assign a value to a local shell variable.
+Variable names can contain uppercase or lowercase letters, digits, and the underscore character. Retrieve the variable value.
+    2.1 Create a variable called file with a value of tmp.zdkei083. The tmp.zdkei083 file exists in the student home directory.
+    [student@servera 14:47:05 ~]$ file=tmp.zdkei083
+
+    2.2 Retrieve the value of the file variable.
+    [student@servera 14:48:35 ~]$ echo $file
+
+    2.3 Use the file variable name and the ls -l command to list the tmp.zdkei083 file.
+    Use the rm command and the file variable name to delete the tmp.zdkei083 file. Verify that the file is deleted.
+    [student@servera 14:59:07 ~]$ ls -l $file
+    [student@servera 14:59:10 ~]$ rm $file
+    [student@servera 14:59:15 ~]$ ls -l $file
+
+3. Assign a value to the EDITOR variable. Use one command to assign the variable as an environment variable.
+[student@servera 14:46:40 ~]$ export EDITOR=vim
+[student@servera 14:46:55 ~]$ echo $EDITOR
+vim
+
+4. Return to the workstation system as the student user.
+[student@servera 14:47:11 ~]$ exit
+
+
+✨lab finish edit-bashconfig
