@@ -1,0 +1,32 @@
+#🤓 Guided Exercise: Make Links Between Files
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start files-make
+
+1. Use the ssh command to log in to the servera machine as the student user.
+The system's configuration supports the use SSH keys for authentication; therefore, you do not require a password.
+[student@workstation ~]$ ssh student@servera
+
+2. Create a hard link called /home/student/links/file.hardlink for the file /home/student/files/target.file.
+Verify the link count for the original file and the new linked file.
+    2.1 View the link count for the file /home/student/files/target.file.
+    [student@servera ~]$ ls -l files/target.file
+
+    2.2 Create a hard link called /home/student/links/file.hardlink. Link it to the file /home/student/files/target.file.
+    [student@servera ~]$ ln /home/student/files/target.file /home/student/links/file.hardlink
+
+    2.3 Verify the link count for the original file /home/student/files/target.file and the new linked file, /home/student/files/file.hardlink.
+    The link count should be 2 for both files.
+    [student@servera ~]$ ls -l files/target.file links/file.hardlink
+
+3. Create a symbolic link called /home/student/tempdir that points to the /tmp directory on the servera machine. Verify the newly created symbolic link.
+    3.1 Create a symbolic link called /home/student/tempdir and link it to the /tmp directory.
+    [student@servera ~]$ ln -s /tmp /home/student/tempdir
+
+    3.2 Use the ls -l command to verify the newly created symbolic link.
+    [student@servera ~]$ ls -l /home/student/tempdir
+
+4. Return to the workstation system as the student user.
+[student@servera ~]$ exit
+
+
+✨lab finish files-make
