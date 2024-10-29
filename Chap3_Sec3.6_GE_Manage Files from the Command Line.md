@@ -1,0 +1,64 @@
+#🤓 Guided Exercise: Manage Files with Command-line Tools
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start files-manage
+
+#Log in to the servera machine as the student user. In the student user's home directory, create three subdirectories: Music, Pictures, and Videos.
+[student@workstation ~]$ ssh student@servera
+
+#In the student user's home directory, use the mkdir command to create three subdirectories: Music, Pictures, and Videos.
+[student@servera ~]$ mkdir Music Pictures Videos
+
+#Use the touch command to create sets of empty practice files to use during this lab. In each set, replace X with the numbers 1 through 6.
+[student@servera ~]$ touch song1.mp3 song2.mp3 song3.mp3 \
+song4.mp3 song5.mp3 song6.mp3
+[student@servera ~]$ touch snap1.jpg snap2.jpg snap3.jpg \
+snap4.jpg snap5.jpg snap6.jpg
+[student@servera ~]$ touch film1.avi film2.avi film3.avi \
+film4.avi film5.avi film6.avi
+[student@servera ~]$ ls -l
+
+#Move the song files (.mp3 extension) to the Music directory, the snapshot files (.jpg extension) to the Pictures directory, and the movie files (.avi extension) to the Videos directory.
+[student@servera ~]$ mv song1.mp3 song2.mp3 song3.mp3 song4.mp3 song5.mp3 song6.mp3 Music
+[student@servera ~]$ mv snap1.jpg snap2.jpg snap3.jpg snap4.jpg snap5.jpg snap6.jpg Pictures
+[student@servera ~]$ mv film1.avi film2.avi film3.avi film4.avi film5.avi film6.avi Videos
+[student@servera ~]$ ls -l Music Pictures Videos
+
+#Create three subdirectories for organizing your files, and name the subdirectories friends, family, and work. Use a single command to create all three subdirectories at the same time.
+[student@servera ~]$ mkdir friends family work
+[student@servera ~]$ ls -l
+
+#Copy files that contain numbers 1 and 2 to the friends directory, and files that contain numbers 3 and 4 to the family directory. Keep in mind that you are making copies; therefore, the original files must remain in their original locations after you complete the step.
+#When you copy files from multiple locations into a single location, Red Hat recommends that you change to the destination directory before you copy the files. Use the simplest path syntax, whether absolute or relative, to reach the source for each file management task.
+
+#Copy files that contain numbers 1 and 2 to the friends directory.
+[student@servera ~]$ cd friends
+[student@servera friends]$ cp ~/Music/song1.mp3 ~/Music/song2.mp3 \
+~/Pictures/snap1.jpg ~/Pictures/snap2.jpg ~/Videos/film1.avi \
+~/Videos/film2.avi .
+[student@servera friends]$ ls -l
+
+#Copy files that contain numbers 3 and 4 to the family directory.
+[student@servera friends]$ cd ../family
+[student@servera family]$ cp ~/Music/song3.mp3 ~/Music/song4.mp3 \
+~/Pictures/snap3.jpg ~/Pictures/snap4.jpg ~/Videos/film3.avi \
+~/Videos/film4.avi .
+[student@servera family]$ ls -l
+
+#Copy the family and friends directories and their contents to the work directory.
+[student@servera family]$ cd ../work
+[student@servera work]$ cp -r ~/family ~/friends .
+[student@servera work]$ ls -l
+
+#Your project tasks are now complete, and it is time to clean up the directories. Use the rm -r command to recursively delete the family, friends, and work directories and their contents.
+[student@servera work]$ cd ..
+[student@servera ~]$ rm -r family friends work
+[student@servera ~]$ ls -l
+
+#Return to the workstation system as the student user.
+[student@servera ~]$ exit
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+x                            x
+x   lab finish files-manage  x
+x                            x
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
