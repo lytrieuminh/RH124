@@ -1,0 +1,56 @@
+#Lab: Access the Command Line
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+As the student user on the workstation machine, use the lab command to prepare your system for this exercise.
+
+This command prepares your environment and ensures that all required resources are available
+[student@workstation ~]$ lab start cli-review
+
+1. Use the date command to display the current time and date.
+[student@workstation ~]$ date
+
+2. Display the current time in 24-hour clock time (for example, 13:57). Hint: The format string that displays that output is %R.
+[student@workstation ~]$ date +%R
+13:58
+
+3. What kind of file is /home/student/zcat? Is it readable by humans?
+[student@workstation ~]$ file zcat
+zcat: a /usr/bin/sh script, ASCII text executable
+
+4. Use the wc command and Bash shortcuts to display the size of the zcat file.
+    4.1 You can use the wc command to display the number of lines, words, and bytes in the zcat script. Instead of retyping the file name, use the Bash history shortcut Esc+. (the keys Esc and . pressed at the same time) to reuse the argument from the previous command.
+    [student@workstation ~]$ wc Esc+.
+    [student@workstation ~]$ wc zcat
+    51  299 1988 zcat
+
+5. Display the first 10 lines of the zcat file.
+    5.1 The head command displays the beginning of the file. Try the Esc+. shortcut again.
+    [student@workstation ~]$ head Esc+.
+    [student@workstation ~]$ head zcat
+
+6. Display the last 10 lines of the zcat file.
+    6.1 Use the tail command to display the last 10 lines of the zcat file.
+    [student@workstation ~]$ tail Esc+.
+    [student@workstation ~]$ tail zcat
+
+7. Repeat the previous command exactly with four or fewer keystrokes.
+    7.1 Repeat the previous command exactly with four or fewer keystrokes.
+    Press the UpArrow key once to scroll back one command through the command history,
+    and then press Enter (uses two keystrokes). An alternative would be to enter the shortcut command !! and then press Enter (uses four keystrokes) to run the most recent command in the command history. Try both methods.
+    [student@workstation]$ !!
+
+8. Use the tail command -n 20 option to display the last 20 lines in the file.
+Use command-line editing to accomplish this task with a minimal number of keystrokes.
+    8.1 Use UpArrow key to display the previous command.
+    Next, use the Ctrl+A key combination to move the cursor to the beginning of the line.
+    Next, use the Ctrl+RightArrow key combination to jump to the next word. Next, add the -n 20 option and press Enter to execute the command.
+    [student@workstation ~]$ tail -n 20 zcat
+
+9. Use the shell history to run the date +%R command again.
+    9.1 Use the history command to display the list of previous commands and to identify the specific date command to execute. Use !number to run the command, where number is the command number to use from the output of the history command.
+    Your shell history might differ from the following example.
+    Determine the command number to use based on the output of your own history command.
+    [student@workstation ~]$ history
+
+
+✨lab grade cli-review
+✨lab finish cli-review
