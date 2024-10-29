@@ -1,0 +1,42 @@
+#🤓 Guided Exercise: Read Manual Pages
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start help-manual
+
+
+1. On workstation, view the gedit man page. View the options for editing a specific file by using gedit from the command line.
+Use one of the options from the gedit man page to open the /home/student/manual file by using gedit with the cursor at the end of the file.
+    1.1 View the gedit man page.
+    [student@workstation ~]$ man gedit
+
+    1.2 In the gedit man page, learn the options for editing a specific file from the command line.
+    Press q to quit the man page.
+
+    1.3 Use the gedit ` command to open the `manual` file.
+    The missing line number next to the ` option opens a file that is passed as an argument with the cursor at the end of the last line.
+    [student@workstation ~]$ gedit + manual
+
+2. Read the su(1) man page.
+If you omit the user argument, then the su command assumes that the user is root. If the su command is followed by a single dash (-), then it starts a child login shell.
+Without the dash, the su command creates a non-login child shell that matches the user's current environment.
+[student@workstation ~]$ man 1 su
+Press q to quit the man page.
+
+3. The man command also has its own manual pages. Open the man(1) command manual page.
+[student@workstation ~]$ man man
+Press q to quit the man page.
+
+4. The /usr/share/man directory contains all man pages. Locate the binary, source, and manual pages for the passwd utility by using the whereis command.
+Verify that the /﻿usr/share/man directory contains the man pages for the passwd utility.
+[student@workstation ~]$ whereis passwd
+
+5. Use the man -k zip command to list the man page with detailed information about a ZIP archive.
+[student@workstation ~]$ man -k zip
+
+6. Use the man -k boot command to list the man page with a list of parameters that can be passed to the kernel at boot time.
+[student@workstation ~]$ man -k boot
+
+7. Use the man -k ext4 command to find the command to tune ext4 file-system parameters.
+[student@workstation ~]$ man -k ext4
+
+
+✨lab finish help-manual

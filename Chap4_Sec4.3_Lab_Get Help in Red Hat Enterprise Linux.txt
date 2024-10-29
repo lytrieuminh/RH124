@@ -1,0 +1,61 @@
+#Lab: Get Help in Red Hat Enterprise Linux
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start help-review
+
+
+1. On the workstation machine, determine how to prepare a man page for printing.
+Specifically, find which is the default format or rendering language for printing.
+    1.1 Use the man man command to determine how to prepare a man page for printing.
+    [student@worksation ~]$ man man
+    Press q to quit the man page.
+
+2. Create a PostScript-formatted output file of the passwd man page. Call the file passwd.ps and place it in the student user's home directory.
+Determine the file format. Inspect the contents of the passwd.ps file by using the less command.
+    2.1 Use the man -t command to create a formatted file of the passwd man page.
+    [student@workstation ~]$ man -t passwd > passwd.ps
+    [student@workstation ~]$ ls -al
+
+    2.2 Use the file command to determine the file format.
+    [student@workstation ~]$ file /home/student/passwd.ps
+
+    2.3 Use the less command to view the /home/student/passwd.ps file.
+    [student@workstation ~]$ less /home/student/passwd.ps
+
+3. By using the man pages, find which commands you can use for viewing and printing PostScript files.
+    3.1 Search in the man pages for information about PostScript files. Use the -k option for this purpose.
+    [student@workstation ~]# man -k postscript viewer
+
+4. Learn how to use the evince(1) viewer in preview mode. Also, determine how to open a document to start on a specific page.
+Open your PostScript file by using evince three times: first by using the default mode, and then with the preview mode option, and finally to start at page 3.
+Close your document file when you finish.
+    4.1 Use the man evince command to learn how to use the viewer in preview mode.
+    [student@workstation ~]$ man evince
+    Press q to quit the man page.
+
+    4.2 Use the evince command to open the /home/student/passwd.ps file.
+    [student@workstation ~]$ evince /home/student/passwd.ps
+
+    4.3 Use the evince -w /home/student/passwd.ps command to open the file in preview mode.
+    [student@workstation ~]$ evince -w /home/student/passwd.ps
+
+    4.4 Use the evince -i 3 /home/student/passwd.ps command to open the file at page 3.
+    [student@workstation ~]$ evince -i 3 /home/student/passwd.ps
+
+5. By using the man pages, research lp(1) to determine how to print any document to start on a specific page.
+Without entering any commands (in the absence of printers), learn the syntax, in one command, to print only pages 2 and 3 of your PostScript file.
+    5.1 Use the man lp command to determine how to print specific pages of a document.
+    [student@workstation ~]$ man lp
+    Press q to quit the man page.
+
+6. Use the Firefox browser to open the system's man page directory (/usr/share/doc) and browse to the man-db package subdirectory. View the provided manuals. After you finish reviewing the man-db manuals, locate and browse to the kexec-tools package subdirectory.
+View the kexec-kdump-howto.txt file, which describes important system configurations that are stored in the /etc/sysconfig directory.
+    6.1 Use firefox /usr/share/doc to view system documentation. Browse the man-db subdirectory. Click the manuals to view them.
+    [student@workstation ~]$ firefox /usr/share/doc
+
+    6.2 In the Firefox browser, locate the kexec-tools package subdirectory and view the kexec-kdump-howto.txt file.
+    This file describes important system configurations that are stored in the /etc/sysconfig directory.
+    Close the document and Firefox when finished.
+
+
+✨lab grade help-review
+✨lab finish help-review
