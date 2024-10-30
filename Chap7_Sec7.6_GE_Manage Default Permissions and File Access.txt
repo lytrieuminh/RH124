@@ -1,0 +1,106 @@
+#🤓 Guided Exercise: Manage Default Permissions and File Access
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start perms-default
+
+
+1. Log in to the servera system as the student user.
+[student@workstation ~]$ ssh student@servera
+
+2. Switch to the operator1 user with redhat as the password.
+[student@servera ~]$ su - operator1
+Password: redhat
+[operator1@servera ~]$
+
+3. List the operator1 user's default umask value.
+[operator1@servera ~]$ umask
+0022
+
+4. Create a /tmp/shared directory. In the /tmp/shared directory, create a defaults file. Look at the default permissions.
+    4.1 Create the /tmp/shared directory. List the permissions of the new directory.
+    [operator1@servera ~]$ mkdir /tmp/shared
+    [operator1@servera ~]$ ls -ld /tmp/shared
+
+    4.2 Create a defaults file in the /tmp/shared directory.
+    [operator1@servera ~]$ touch /tmp/shared/defaults
+
+    4.3 List the permissions of the new file.
+    [operator1@servera ~]$ ls -l /tmp/shared/defaults
+
+5. Change the group ownership of the /tmp/shared directory to the operators group. Confirm the new ownership and permissions.
+    5.1 Change the group ownership of the /tmp/shared directory to the operators group.
+    [operator1@servera ~]$ chown :operators /tmp/shared
+
+    5.2 List the permissions of the /tmp/shared directory.
+    [operator1@servera ~]$ ls -ld /tmp/shared
+
+    5.3 Create a group file in the /tmp/shared directory. List the file permissions.
+    [operator1@servera ~]$ touch /tmp/shared/group
+    [operator1@servera ~]$ ls -l /tmp/shared/group
+
+ 6. Ensure that the operators group owns files that are created in the /tmp/shared directory.
+    6.1 Set the group ID to the operators group for the /tmp/shared directory.
+    [operator1@servera ~]$ chmod g+s /tmp/shared
+
+    6.2 Create a ops_db.txt file in the /tmp/shared directory.
+    [operator1@servera ~]$ touch /tmp/shared/ops_db.txt
+
+    6.3 Verify that the operators group is the group owner for the new file.
+    [operator1@servera ~]$ ls -l /tmp/shared/ops_db.txt
+
+7. Create an ops_net.txt file in the /tmp/shared directory. Record the ownership and permissions.
+Change the umask for the operator1 user. Create an ops_prod.txt file. Record the ownership and permissions of the ops_prod.txt file.
+    7.1 Create an ops_net.txt file in the /tmp/shared directory.
+    [operator1@servera ~]$ touch /tmp/shared/ops_net.txt
+
+    7.2 List the permissions of the ops_net.txt file.
+    [operator1@servera ~]$ ls -l /tmp/shared/ops_net.txt
+
+    7.3 Change the umask for the operator1 user to 027. Confirm the change.
+    [operator1@servera ~]$ umask 027
+    [operator1@servera ~]$ umask
+    0027
+
+    7.4 Create an ops_prod.txt file in the /tmp/shared/ directory.
+    Verify that newly created files have read-only access for the operators group and no access for other users.
+    [operator1@servera ~]$ touch /tmp/shared/ops_prod.txt
+    [operator1@servera ~]$ ls -l /tmp/shared/ops_prod.txt
+
+8. Open a new terminal window and log in to servera as operator1.
+[student@workstation ~]$ ssh operator1@servera
+
+9. List the umask value for operator1.
+[operator1@servera ~]$ umask
+0022
+
+10. Change the default umask for the operator1 user. The new umask prohibits all access for users that are not in their group. Confirm that the umask is changed.
+    10.1 Change the default umask for the operator1 user to 007.
+    [operator1@servera ~]$ echo "umask 007" >> ~/.bashrc
+    [operator1@servera ~]$ cat ~/.bashrc
+    # .bashrc
+
+    # Source global definitions
+    if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+    fi
+    ...output omitted...
+    umask 007
+
+    10.2 Log out and log in again as the operator1 user. Confirm that the change is permanent.
+    [operator1@servera ~]$ exit
+    logout
+    Connection to servera closed.
+    [student@workstation ~]$ ssh operator1@servera
+    ...output omitted...
+    [operator1@servera ~]$ umask
+    0007
+
+11. Create an ops_prod2.txt file in the /tmp/shared/ directory.
+Verify that newly created files have read and write access for the operators group and no access for other users, due to the new umask of 007.
+[operator1@servera ~]$ touch /tmp/shared/ops_prod2.txt
+[operator1@servera ~]$ ls -l /tmp/shared/ops_prod2.txt
+
+12. On servera, close all operator1 and student user shells. Return to the workstation system as the student user.
+[operator1@servera ~]$ exit
+
+
+✨lab finish perms-default

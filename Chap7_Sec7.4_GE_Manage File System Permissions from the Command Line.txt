@@ -1,0 +1,66 @@
+#🤓 Guided Exercise: Manage File System Permissions from the Command Line
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start perms-cli
+
+
+1. From workstation, log in to servera as the student user and switch to the root user.
+[student@workstation ~]$ ssh student@servera
+[student@servera ~]$ sudo -i
+
+2. Create the /home/consultants directory.
+[root@servera ~]# mkdir /home/consultants
+
+3. Change the group ownership of the consultants directory to consultants.
+[root@servera ~]# chown :consultants /home/consultants
+
+4. Modify the permissions of the consultants group to allow its group members to create files in, and delete files from, the /home/consultants directory.
+The current permissions forbid others from accessing the files. You must set the appropriate permissions.
+    4.1 Verify that the permissions of the consultants group allow its group members to create files in, and delete files from, the /home/consultants directory.
+    Note that the consultants group currently does not have write permission.
+    [root@servera ~]# ls -ld /home/consultants
+
+    4.2 Add write permission to the consultants group. Use the symbolic method for setting the appropriate permissions.
+    [root@servera ~]# chmod g+w /home/consultants
+    [root@servera ~]# ls -ld /home/consultants
+
+    4.3 Forbid others from accessing files in the /home/consultants directory. Use the octal method for setting the appropriate permissions.
+    [root@servera ~]# chmod 770 /home/consultants
+    [root@servera ~]# ls -ld /home/consultants
+
+5. Exit the root shell and switch to the consultant1 user. The password is redhat.
+[root@servera ~]# exit
+logout
+[student@servera ~]$ su - consultant1
+Password: redhat
+[consultant1@servera ~]$
+
+6. Navigate to the /home/consultants directory and create a file called consultant1.txt.
+    6.1 Change to the /home/consultants directory.
+    [consultant1@servera ~]$ cd /home/consultants
+
+    6.2 Create an empty file called consultant1.txt.
+    [consultant1@servera consultants]$ touch consultant1.txt
+
+7. List the contents of the /home/consultants directory.
+[consultant1@servera consultants]$ ls
+
+8. Exit the shell and switch to the consultant2 user. The password is redhat.
+[consultant1@servera consultants]$ exit
+[student@servera ~]$ su - consultant2
+Password: redhat
+[consultant2@servera ~]$
+
+9. Navigate to the /home/consultants directory. Ensure that the consultant2 user can add content to the consultant1.txt file.
+    9.1 Change to the /home/consultants directory. Create an empty file called consultant2.txt.
+    [consultant2@servera ~]$ cd /home/consultants/
+    [consultant2@servera consultants]$ touch consultant2.txt
+
+10. List the contents of the /home/consultants directory.
+[consultant2@servera consultants]$ ls
+
+11. Return to the workstation system as the student user.
+[consultant2@servera consultants]$ exit
+[student@servera ~]$ exit
+
+
+✨lab finish perms-cli

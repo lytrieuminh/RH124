@@ -1,0 +1,101 @@
+#Lab: Control Access to Files
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start perms-review
+
+
+1. Log in to serverb as the student user. Run the sudo -i command at the shell prompt to become the root user.
+Use student as the student user password.
+[student@workstation ~]$ ssh student@serverb
+...output omitted...
+[student@serverb ~]$ sudo -i
+[sudo] password for student: student
+[root@serverb ~]#
+
+2. Create a /home/techdocs directory.
+    2.1 Use the mkdir command to create a /home/techdocs directory.
+    [root@serverb ~]# mkdir /home/techdocs
+
+3. Change the group ownership of the /home/techdocs directory to the techdocs group.
+    3.1 Use the chown command to change the group ownership for the /home/techdocs directory to the techdocs group.
+    [root@serverb ~]# chown :techdocs /home/techdocs
+
+4. Verify that users in the techdocs group cannot create files in the /home/techdocs directory.
+    4.1 Use the su command to switch to the tech1 user.
+    [root@serverb ~]# su - tech1
+    [tech1@serverb ~]$
+
+    4.2 Create a techdoc1.txt file in the /home/techdocs directory. This step should fail.
+    Although the /home/techdocs directory is owned by the techdocs group and tech1 is part of the techdocs group, you cannot create a file in that directory.
+    The reason is because the techdocs group does not have write permission.
+    [tech1@serverb ~]$ touch /home/techdocs/techdoc1.txt
+
+    4.3 List the directory's permissions.
+    [tech1@serverb ~]$ ls -ld /home/techdocs/
+
+5. Set permissions on the /home/techdocs directory. On the /home/techdocs directory, configure setgid (2); read, write, and execute permissions (7) for the owner/user and group; and no permissions (0) for other users.
+    5.1 Exit from the tech1 user shell.
+    [tech1@serverb ~]$ exit
+    logout
+    [root@serverb ~]#
+
+    5.2 Set the group permission for the /home/techdocs directory. Configure setgid; read, write, and execute permissions for the owner and group; and no permissions for others.
+    [root@serverb ~]# chmod 2770 /home/techdocs
+
+6. Verify that the permissions are set correctly.
+The techdocs group now has write permission.
+[root@serverb ~]# ls -ld /home/techdocs
+
+7. Confirm that users in the techdocs group can now create and edit files in the /home/techdocs directory. Users that are not in the techdocs group cannot edit or create files in the /home/techdocs directory.
+The tech1 and tech2 users are in the techdocs group. The database1 user is not in that group.
+    7.1 Switch to the tech1 user. Create a techdoc1.txt file in the /home/techdocs directory. Add some text to the /home/techdocs/techdoc1.txt file. Exit from the tech1 user shell.
+    [root@serverb ~]# su - tech1
+    [tech1@serverb ~]$ touch /home/techdocs/techdoc1.txt
+    [tech1@serverb ~]$ ls -l /home/techdocs/techdoc1.txt
+    -rw-r--r--. 1 tech1 techdocs 0 Feb  5 16:42 /home/techdocs/techdoc1.txt
+    [tech1@serverb ~]$ echo "This is the first tech doc." > /home/techdocs/techdoc1.txt
+    [tech1@serverb ~]$ exit
+    logout
+    [root@serverb ~]#
+
+    7.2 Switch to the tech2 user. Display the content of the /home/techdocs/techdoc1.txt file. Create a techdoc2.txt file in the /home/techdocs directory. Exit from the tech2 user shell.
+    [root@serverb ~]# su - tech2
+    [tech2@serverb ~]$ cd /home/techdocs
+    [tech2@serverb techdocs]$ cat techdoc1.txt
+    This is the first tech doc.
+    [tech2@serverb techdocs]$ touch /home/techdocs/techdoc2.txt
+    [tech2@serverb techdocs]$ ls -l
+    [tech2@serverb techdocs]$ exit
+
+    7.3 Switch to the database1 user. Display the content of the /home/techdocs/techdoc1.txt file. You get a Permission Denied message. Verify that the database1 user does not have access to the file. Exit from the database1 user shell.
+    Enter the following long echo command on a single line:
+    [root@serverb ~]# su - database1
+    [database1@serverb ~]$ cat /home/techdocs/techdoc1.txt
+    cat: /home/techdocs/techdoc1.txt: Permission denied
+    [database1@serverb ~]$ ls -l /home/techdocs/techdoc1.txt
+    ls: cannot access '/home/techdocs/techdoc1.txt': Permission denied
+    [database1@serverb ~]$ exit
+
+8. Modify the /etc/login.defs file to adjust the default umask for login shells. Normal users should have a umask setting that allows the user and group to create, write, and execute files and directories, and preventing other users from viewing, modifying, or executing new files and directories.
+    8.1 Determine the umask of the student user. Switch to the student login shell. When done, exit from the shell.
+    [root@serverb ~]# su - student
+    [student@serverb ~]$ umask
+    0022
+    [student@serverb ~]$ exit
+
+    8.2 Edit the /etc/login.defs file and set a umask of 007. The /etc/login.defs file already contains a umask definition. Search the file and update with the appropriate value.
+    [root@serverb ~]# cat /etc/login.defs
+
+    8.3 As the student user, verify that the global umask changes to 007.
+    [root@serverb ~]# exit
+    [student@serverb ~]$ exit
+    [student@workstation ~]$ ssh student@serverb
+    ...output omitted...
+    [student@serverb ~]$ umask
+    0007
+
+    8.4 Return to the workstation system as the student user.
+    [student@serverb ~]$ exit
+
+
+✨lab grade perms-review
+✨lab finish perms-review
