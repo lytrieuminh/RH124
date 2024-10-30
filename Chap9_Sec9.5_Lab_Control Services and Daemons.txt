@@ -1,0 +1,60 @@
+#Lab: Control Services and Daemons
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start services-review
+
+
+1. Use the ssh command to log in to the serverb machine as the student user. On the serverb machine, start the psacct service.
+    1.1 Log in to the serverb machine as the student user and switch to the root user.
+    [student@workstation ~]$ ssh student@serverb
+    ...output omitted...
+    [student@serverb ~]$ sudo -i
+    [sudo] password for student: student
+
+    1.2 Verify the status of the psacct service. The psacct service is in an inactive and disabled state.
+    The disabled state confirms that the service does not start at boot time.
+    [root@serverb ~]# systemctl status psacct
+
+    1.3 Start the psacct service.
+    [root@serverb ~]# systemctl start psacct
+
+    1.4 Verify that the psacct service is running.
+    [root@serverb ~]# systemctl is-active psacct
+    active
+
+
+2. Configure the psacct service to start at system boot.
+    2.1 Enable the psacct service to start at system boot.
+    [root@serverb ~]# systemctl enable psacct
+
+    2.2 Verify that the psacct service is enabled to start at system boot.
+    [root@serverb ~]# systemctl is-enabled psacct
+    enabled
+
+
+3. Stop the rsyslog service.
+    3.1 Verify the status of the rsyslog service. Notice that the rsyslog service is running and enabled to start at boot time. Press q to exit the command.
+    [root@serverb ~]# systemctl status rsyslog
+
+    3.2 Stop the rsyslog service.
+    [root@serverb ~]# systemctl stop rsyslog
+
+    3.3 Verify that the rsyslog service is stopped.
+    [root@serverb ~]# systemctl is-active rsyslog
+    inactive
+
+
+4. Configure the rsyslog service so that it does not start at system boot.
+    4.1 Disable the rsyslog service so that it does not start at system boot.
+    [root@serverb ~]# systemctl disable rsyslog
+
+    4.2 Verify that the rsyslog service does not start during the boot process.
+    [root@serverb ~]# systemctl is-enabled rsyslog
+    disabled
+
+
+5. Reboot the serverb machine before evaluating the lab.
+[root@serverb ~]# systemctl reboot
+
+
+✨lab grade services-review
+✨lab finish services-review

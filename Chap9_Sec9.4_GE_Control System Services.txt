@@ -1,0 +1,75 @@
+#🤓 Guided Exercise: Control System Services
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start services-control
+
+
+1. Log in to the servera machine as the student user and switch to the root user.
+[student@workstation ~]$ ssh student@servera
+...output omitted...
+[student@servera ~]$ sudo -i
+[sudo] password for student: student
+
+2. Restart and reload the sshd service, and observe the results.
+    2.1 Display the status of the sshd service. Note the process ID of the sshd daemon. Press q to exit the command.
+    [root@servera ~]# systemctl status sshd
+
+    2.2 Restart the sshd service and view the status. In this example, the process ID of the daemon changes from 784 to 1193. Press q to exit the command.
+    [root@servera ~]# systemctl restart sshd
+    [root@servera ~]# systemctl status sshd
+
+    2.3 Reload the sshd service and view the status. The process ID of the daemon does not change. Press q to exit the command.
+    [root@servera ~]# systemctl reload sshd
+    [root@servera ~]# systemctl status sshd
+
+3. Verify that the chronyd service is running. Press q to exit the command.
+[root@servera ~]# systemctl status chronyd
+
+4. Stop the chronyd service and view the status. Press q to exit the command.
+[root@servera ~]# systemctl stop chronyd
+[root@servera ~]# systemctl status chronyd
+
+5. Determine whether the chronyd service is enabled to start at system boot.
+[root@servera ~]# systemctl is-enabled chronyd
+enabled
+
+
+6. Reboot the servera machine, and then view the status of the chronyd service.
+[root@servera ~]# systemctl reboot
+Connection to servera closed by remote host.
+Connection to servera closed.
+[student@workstation ~]$
+
+
+    6.1 Log in as the student user on the servera machine, and switch to the root user. View the status of the chronyd service. Press q to exit the command.
+    [student@workstation ~]$ ssh student@servera
+    ...output omitted...
+    [student@servera ~]$ sudo -i
+    [sudo] password for student: student
+    [root@servera ~]# systemctl status chronyd
+
+
+7. Disable the chronyd service so that it does not start at boot, and then view the status of the service. Press q to exit the command.
+[root@servera ~]# systemctl disable chronyd
+Removed /etc/systemd/system/multi-user.target.wants/chronyd.service.
+[root@servera ~]# systemctl status chronyd
+
+
+8. Reboot servera, and then view the status of the chronyd service.
+[root@servera ~]# systemctl reboot
+
+    8.1 Log in as the student user on servera, and view the status of the chronyd service. Press q to exit the command.
+    [student@workstation ~]$ ssh student@servera
+    ...output omitted...
+    [student@servera ~]$ systemctl status chronyd
+    ○ chronyd.service - NTP client/server
+        Loaded: loaded (/usr/lib/systemd/system/chronyd.service; disabled; vendor preset: enabled)
+        Active: inactive (dead)
+        Docs: man:chronyd(8)
+                man:chrony.conf(5)
+
+
+9. Return to the workstation system as the student user.
+[student@servera ~]$ exit
+
+
+✨lab finish services-control
