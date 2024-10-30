@@ -1,0 +1,71 @@
+#🤓 Guided Exercise: Manage Local User Accounts
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start users-user
+
+
+1. From workstation, open an SSH session to servera as the student user, and switch to the root user.
+[student@workstation ~]$ ssh student@servera
+...output omitted...
+[student@servera ~]$ sudo -i
+[sudo] password for student: student
+
+2. Create the operator1 user and confirm that it exists in the system.
+[root@servera ~]# useradd operator1
+[root@servera ~]# tail /etc/passwd
+
+3. Set the password for operator1 to redhat.
+[root@servera ~]# passwd operator1
+Changing password for user operator1.
+New password: redhat
+BAD PASSWORD: The password is shorter than 8 characters
+Retype new password: redhat
+passwd: all authentication tokens updated successfully.
+
+4. Create the additional operator2 and operator3 users. Set their passwords to redhat.
+    4.1 Add the operator2 user. Set the password for operator2 to redhat.
+    [root@servera ~]# useradd operator2
+    [root@servera ~]# passwd operator2
+    Changing password for user operator2.
+    New password: redhat
+    BAD PASSWORD: The password is shorter than 8 characters
+    Retype new password: redhat
+    passwd: all authentication tokens updated successfully.
+
+    4.2 Add the operator3 user. Set the password for operator3 to redhat.
+    [root@servera ~]# useradd operator3
+    [root@servera ~]# passwd operator3
+    Changing password for user operator3.
+    New password: redhat
+    BAD PASSWORD: The password is shorter than 8 characters
+    Retype new password: redhat
+    passwd: all authentication tokens updated successfully.
+    
+5. Update the operator1 and operator2 user accounts to include the Operator One and Operator Two comments, respectively.
+Verify that the comments exist for the user accounts.
+    5.1 Run the usermod -c command to update the comments of the operator1 user account.
+    [root@servera ~]# usermod -c "Operator One" operator1
+
+    5.2 Run the usermod -c command to update the comments of the operator2 user account.
+    [root@servera ~]# usermod -c "Operator Two" operator2
+
+    5.3 View the /etc/passwd file to confirm that the comments for each of the operator1 and operator2 users exist.
+    [root@servera ~]# tail /etc/passwd
+
+6. Delete the operator3 user along with any personal data of the user. Confirm that the operator3 does not exist.
+    6.1 Remove the operator3 user from the system.
+    [root@servera ~]# userdel -r operator3
+
+    6.2 Confirm that the operator3 user does not exist
+    [root@servera ~]# tail /etc/passwd
+
+    6.3 Confirm that the operator3 user home directory does not exist.
+    [root@servera ~]# ls -l /home
+
+    6.4 Exit the root user's shell to return to the student user's shell.
+    [root@servera ~]# exit
+
+    6.5 Log off from the servera machine.
+    [student@servera ~]$ exit
+
+
+✨lab finish users-user

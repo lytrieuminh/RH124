@@ -1,0 +1,69 @@
+#🤓 Guided Exercise: Manage Local Group Accounts
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start users-group
+
+
+1. From workstation, open an SSH session to servera as the student user and switch to the root user.
+[student@workstation ~]$ ssh student@servera
+...output omitted...
+[student@servera ~]$ sudo -i
+[sudo] password for student: student
+[root@servera ~]#
+
+2. Create the operators supplementary group with a GID of 30000.
+[root@servera ~]# groupadd -g 30000 operators
+
+3. Create the admin supplementary group without specifying a GID.
+[root@servera ~]# groupadd admin
+
+4. Verify that both the operators and admin supplementary groups exist.
+[root@servera ~]# tail /etc/group
+
+5. Ensure that the operator1, operator2, and operator3 users belong to the operators group.
+    5.1 Add the operator1, operator2, and operator3 users to the operators group.
+    [root@servera ~]# usermod -aG operators operator1
+    [root@servera ~]# usermod -aG operators operator2
+    [root@servera ~]# usermod -aG operators operator3
+
+    5.2 Confirm that the users are in the group.
+    [root@servera ~]# id operator1
+    uid=1002(operator1) gid=1002(operator1) groups=1002(operator1),30000(operators)
+    [root@servera ~]# id operator2
+    uid=1003(operator2) gid=1003(operator2) groups=1003(operator2),30000(operators)
+    [root@servera ~]# id operator3
+    uid=1004(operator3) gid=1004(operator3) groups=1004(operator3),30000(operators)
+
+6. Ensure that the sysadmin1, sysadmin2, and sysadmin3 users belong to the admin group. Enable administrative rights for all the admin group members.
+Verify that any member of the admin group can run administrative commands.
+    6.1 Add the sysadmin1, sysadmin2, and sysadmin3 users to the admin group.
+    [root@servera ~]# usermod -aG admin sysadmin1
+    [root@servera ~]# usermod -aG admin sysadmin2
+    [root@servera ~]# usermod -aG admin sysadmin3
+
+    6.2 Confirm that the users are in the group.
+    [root@servera ~]# id sysadmin1
+    uid=1005(sysadmin1) gid=1005(sysadmin1) groups=1005(sysadmin1),30001(admin)
+    [root@servera ~]# id sysadmin2
+    uid=1006(sysadmin2) gid=1006(sysadmin2) groups=1006(sysadmin2),30001(admin)
+    [root@servera ~]# id sysadmin3
+    uid=1007(sysadmin3) gid=1007(sysadmin3) groups=1007(sysadmin3),30001(admin)
+
+    6.3 Examine the /etc/group file to verify the supplementary group memberships.
+    [root@servera ~]# tail /etc/group
+
+    6.4 Create the /etc/sudoers.d/admin file so that the members of the admin group have full administrative privileges.
+    [root@servera ~]# echo "%admin ALL=(ALL) ALL" >> /etc/sudoers.d/admin
+
+    6.5 Switch to the sysadmin1 user (a member of the admin group) and verify that you can run a sudo command.
+    [root@servera ~]# su - sysadmin1
+    [sysadmin1@servera ~]$ sudo cat /etc/sudoers.d/admin
+    [sudo] password for sysadmin1: redhat
+    %admin ALL=(ALL) ALL
+
+    6.6 Return to the workstation machine as the student user.
+    [sysadmin1@servera ~]$ exit
+    [root@servera ~]# exit
+    [student@servera ~]$ exit
+
+
+✨lab finish users-group

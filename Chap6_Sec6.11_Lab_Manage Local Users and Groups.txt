@@ -1,0 +1,91 @@
+#Lab: Manage Local Users and Groups
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start users-review
+
+
+1. From the workstation machine, open an SSH session to the serverb machine as the student user and switch to the root user.
+[student@workstation ~]$ ssh student@serverb
+...output omitted...
+[student@serverb ~]$ sudo -i
+[sudo] password for student: student
+[root@serverb ~]#
+
+2. On the serverb machine, ensure that newly created users must change their passwords every 30 days.
+    2.1 Set PASS_MAX_DAYS to 30 in the /etc/login.defs file. Use administrative rights when opening the file with the text editor.
+    You can use the vim /etc/login.defs command for this step.
+    ...output omitted...
+    # Password aging controls:
+    #
+    #       PASS_MAX_DAYS   Maximum number of days a password may be
+    #       used.
+    #       PASS_MIN_DAYS   Minimum number of days allowed between
+    #       password changes.
+    #       PASS_MIN_LEN    Minimum acceptable password length.
+    #       PASS_WARN_AGE   Number of days warning given before a
+    #       password expires.
+    #
+    PASS_MAX_DAYS 30
+    PASS_MIN_DAYS   0
+    PASS_WARN_AGE   7
+    ...output omitted...
+
+3. Create the consultants group with a GID of 35000.
+[root@serverb ~]# groupadd -g 35000 consultants
+
+4. Configure administrative rights to enable all consultants group members to execute any command as any user. Avoid using visudo to edit the /etc/sudoers file.
+Instead, place the configuration file in the /etc/sudoers.d directory.
+    4.1 Create the /etc/sudoers.d/consultants file and add the following content to it.
+    You can use the vim /etc/sudoers.d/consultants command for this step.
+    %consultants  ALL=(ALL) ALL
+
+5. Create the consultant1, consultant2, and consultant3 users with the consultants group as their supplementary group.
+[root@serverb ~]# useradd -G consultants consultant1
+[root@serverb ~]# useradd -G consultants consultant2
+[root@serverb ~]# useradd -G consultants consultant3
+
+6. Set the consultant1, consultant2, and consultant3 passwords to redhat.
+[root@serverb ~]# passwd consultant1
+Changing password for user consultant1.
+New password: redhat
+BAD PASSWORD: The password is shorter than 8 characters
+Retype new password: redhat
+passwd: all authentication tokens updated successfully.
+[root@serverb ~]# passwd consultant2
+Changing password for user consultant2.
+New password: redhat
+BAD PASSWORD: The password is shorter than 8 characters
+Retype new password: redhat
+passwd: all authentication tokens updated successfully
+[root@serverb ~]# passwd consultant3
+Changing password for user consultant3.
+New password: redhat
+BAD PASSWORD: The password is shorter than 8 characters
+Retype new password: redhat
+passwd: all authentication tokens updated successfully
+
+7. Set the consultant1, consultant2, and consultant3 accounts to expire in 90 days from the current day.
+    7.1 Determine the date 90 days in the future. This returned date is an example; the value that you see, to use in the following step, is based on the current date and time in your system.
+    [root@serverb ~]# date -d "+90 days" +%F
+    2022-06-08
+
+    7.2 Set the account expiry date of the consultant1, consultant2, and consultant3 accounts to the same value as determined in the preceding step. For example:
+    [root@serverb ~]# chage -E 2022-06-08 consultant1
+    [root@serverb ~]# chage -E 2022-06-08 consultant2
+    [root@serverb ~]# chage -E 2022-06-08 consultant3
+
+8. Change the password policy for the consultant2 account to require a new password every 15 days.
+[root@serverb ~]# chage -M 15 consultant2
+
+9. Additionally, force the consultant1, consultant2, and consultant3 users to change their passwords on the first login.
+    9.1 Set the last day of the password change to 0 so that users must change the password when they first log in to the system.
+    [root@serverb ~]# chage -d 0 consultant1
+    [root@serverb ~]# chage -d 0 consultant2
+    [root@serverb ~]# chage -d 0 consultant3
+
+    9.2 Return to the workstation system as the student user.
+    [root@serverb ~]# exit
+    [student@serverb ~]$ exit
+
+
+✨lab grade users-review
+✨lab finish users-review
