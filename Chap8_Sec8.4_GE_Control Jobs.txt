@@ -1,0 +1,127 @@
+#🤓 Guided Exercise: Control Jobs
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start processes-control
+
+
+1. On the workstation machine, open two terminal windows side by side. In this section, these two terminals are referred to as left and right.
+In each terminal, log in to the servera machine as the student user.
+[student@workstation ~]$ ssh student@servera
+
+2. In the left terminal shell, create the /home/student/bin directory. Create a shell script called control in the /home/student/bin directory.
+Change the script permissions to make it executable.
+    2.1 Create the /home/student/bin directory.
+    [student@servera ~]$ mkdir /home/student/bin
+
+    2.2 Create a script called control in the /home/student/bin directory. To enter Vim interactive mode, press the i key.
+    Use the :wq command to save the file and quit.
+    NOTE: The control script runs until the process is terminated.
+    The script appends command-line arguments to the ~/control_outfile file once per second.
+
+    [student@servera ~]$ vim /home/student/bin/control
+    #!/bin/bash
+    while true; do
+        echo -n "$@ " >> ~/control_outfile
+        sleep 1
+    done
+
+
+    2.3 Make the control file executable.
+    [student@servera ~]$ chmod +x /home/student/bin/control
+
+3. Execute the control script. The script continuously appends the word "technical" and a space to the ~/control_outfile file at one-second intervals.
+[student@servera ~]$ control technical
+
+4. In the right terminal shell, verify that the new process is writing to the /home/student/control_outfile file.
+[student@servera ~]$ tail -f ~/control_outfile
+technical technical technical technical
+
+5. In the left terminal shell, press Ctrl+z to suspend the running process. The shell returns the job ID in square brackets.
+In the right terminal shell, confirm that the process output is stopped.
+^Z
+[1]+  Stopped                 control technical
+[student@servera ~]$
+
+6. In the left terminal shell, view the jobs command output. Remember that the + sign indicates the default job. Restart the job in the background.
+In the right terminal shell, verify that the process output is again active.
+    6.1 View the list of jobs.
+    [student@servera ~]$ jobs
+    [1]+  Stopped                 control technical
+
+    6.2 Restart the control job in the background.
+    [student@servera ~]$ bg
+    [1]+ control technical &
+
+    6.3 Verify that the control job is running again.
+    [student@servera ~]$ jobs
+    [1]+  Running                 control technical &
+
+    6.4 In the right terminal shell, confirm that the tail command is producing output.
+    ...output omitted...
+    technical technical technical technical technical technical technical technical
+
+7. In the left terminal shell, start two more control processes to append to the ~/output file.
+Use the ampersand (&) special command to start the processes in the background. Replace technical with documents and then with database.
+Replacing the arguments helps to differentiate between the three processes.
+[student@servera ~]$ control documents &
+[2] 6579
+[student@servera ~]$ control database &
+[3] 6654
+
+8. In the left terminal shell, use the jobs command to view the three running processes.
+In the right terminal shell, verify that all three processes are appending to the file.
+[student@servera ~]$ jobs
+[1]   Running                 control technical &
+[2]-  Running                 control documents &
+[3]+  Running                 control database &
+
+...output omitted...
+technical documents database technical documents database technical documents database technical documents database
+...output omitted...
+
+9. Suspend the control technical process. Confirm that it is suspended. Terminate the control documents process and verify that it is terminated.
+    9.1 In the left terminal shell, foreground the control technical process. Press Ctrl+z to suspend the process. Verify that the process is suspended.
+    [student@servera ~]$ fg %1
+    control technical
+    ^Z
+    [1]+  Stopped                 control technical
+    [student@servera ~]$ jobs
+    [1]+  Stopped                 control technical
+    [2]   Running                 control documents &
+    [3]-  Running                 control database &
+
+    9.2 In the right terminal shell, verify that the control technical process is no longer sending output.
+    database documents  database documents  database
+    ...no further output...
+
+    9.3 In the left terminal shell, run the control documents process in the foreground. Press Ctrl+c to terminate the process. Verify that the process is terminated.
+    [student@servera ~]$ fg %2
+    control documents
+    ​^C
+    [student@servera ~]$ jobs
+    [1]+  Stopped                 control technical
+    [3]-  Running                 control database &
+
+    9.4 In the right terminal shell, verify that the control documents process is no longer sending output.
+    ...output omitted...
+    database database database database database database database database
+    ...no further output...
+
+10. In the left terminal shell, view the remaining jobs. The suspended jobs have a state of T.
+The other background jobs are sleeping and have a state of S.
+[student@servera ~]$ ps jT
+
+11. In the left terminal shell, view the current jobs. Terminate the control database process and verify that it is terminated.
+[student@servera ~]$ jobs
+[1]+  Stopped                 control technical
+[3]-  Running                 control database &
+
+12. In the right terminal shell, use the Ctrl+c command to stop the tail command. Delete the ~/control_outfile file.
+...output omitted...
+​^C
+[student@servera ~]$ rm ~/control_outfile
+
+13. Close the extra terminal. Return to the workstation system as the student user.
+[student@servera ~]$ exit
+
+
+✨lab finish processes-control

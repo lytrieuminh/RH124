@@ -1,0 +1,106 @@
+#🤓 Guided Exercise: Kill Processes
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start processes-kill
+
+
+1. On the workstation machine, open two terminal windows side by side. In this section, these terminals are referred to as left and right.
+In each terminal, use the ssh command to log in to the servera machine as the student user.
+[student@workstation ~]$ ssh student@servera
+
+2. In the left terminal shell, create the /home/student/bin directory. Create the instance shell script in the new directory. Change the script permissions so that it is executable.
+    2.1 Create the /home/student/bin directory.
+    [student@servera ~]$ mkdir /home/student/bin
+
+    2.2 Create the instance script file in the /home/student/bin directory. Press the i key to enter Vim interactive mode. The file must have the following content as shown.
+    Use the :wq command to save the file.
+    NOTE: The instance script runs until the process is terminated.
+    It appends command-line arguments to the ~/instance_outfile file once every 5 seconds.
+
+    [student@servera ~]$ cd /home/student/bin
+    [student@servera bin]$ vim /home/student/bin/instance
+    #!/bin/bash
+    while true; do
+        echo -n "$@ " >> ~/instance_outfile
+        sleep 5
+    done
+
+
+    2.3 Make the instance script file executable.
+    [student@servera bin]$ chmod +x /home/student/bin/instance
+
+3. In the left terminal shell, change into the /home/student/bin/ directory. Start three processes with the instance script file, by passing the network, interface, and connection arguments.
+Start the processes in the background.
+[student@servera bin]$ instance network &
+[1] 3460
+[student@servera bin]$ instance interface &
+[2] 3482
+[student@servera bin]$ instance connection &
+[3] 3516
+
+4. In the right terminal shell, verify that all three processes are appending content to the /home/student/instance_outfile file.
+[student@servera ~]$ tail -f ~/instance_outfile
+network interface network connection interface network connection interface network
+...output omitted...
+
+5. In the left terminal shell, list existing jobs.
+[student@servera bin]$ jobs
+[1]   Running                 instance network &
+[2]-  Running                 instance interface &
+[3]+  Running                 instance connection &
+
+6. Use signals to suspend the instance network process. Verify that the instance network process is set to Stopped. Verify that the network process is no longer appending content to the ~/instance_output file.
+    6.1 Stop the instance network process. Verify that the process is stopped.
+    [student@servera bin]$ kill -SIGSTOP %1
+    [1]+  Stopped                 instance network
+    [student@servera bin]$ jobs
+
+    6.2 In the right terminal shell, view the tail command output. Verify that the word network is no longer appended to the ~/instance_outfile file.
+    ...output omitted...
+    interface connection interface connection interface connection interface
+
+
+7. In the left terminal shell, terminate the instance interface process. Verify that the instance interface process disappeared. Verify that the instance interface process output is no longer appended to the ~/instance_outfile file.
+    7.1 Terminate the instance interface process. Verify that the process is terminated.
+    [student@servera bin]$ kill -SIGTERM %2
+    [student@servera bin]$ jobs
+
+    7.2 In the right terminal shell, view the tail command output. Verify that the word interface is no longer appended to the ~/instance_outfile file.
+    ...output omitted...
+    connection connection connection connection connection connection connection connection
+
+
+8. In the left terminal shell, resume the instance network process. Verify that the instance network process is set to Running. Verify that the instance network process output is appended to the ~/instance_outfile file.
+    8.1 Resume the instance network process. Verify that the process is in the Running state.
+    [student@servera bin]$ kill -SIGCONT %1
+    [student@servera bin]$ jobs
+
+    8.2 In the right terminal shell, view the tail command output. Verify that the word network is appended to the ~/instance_outfile file.
+    ...output omitted...
+    network connection network connection network connection network connection network connection
+
+
+9. In the left terminal shell, terminate the remaining two jobs. Verify that no jobs remain and that output is stopped.
+    9.1 Terminate the instance network process. Next, terminate the instance connection process.
+    [student@servera bin]$ kill -SIGTERM %1
+    [student@servera bin]$ kill -SIGTERM %3
+    [student@servera bin]$ jobs
+
+10. In the left terminal shell, list the current running processes in all open terminal shells. Terminate the tail processes. Verify that the processes are no longer running.
+    10.1 List all current running processes. Refine the search to view only tail lines.
+    [student@servera bin]$ ps -ef | grep tail
+
+    10.2 Terminate the tail process. Verify that the process is no longer running.
+    [student@servera bin]$ pkill -SIGTERM tail
+    [student@servera bin]$ ps -ef | grep tail
+
+    10.3 In the right terminal shell, verify that the tail command is no longer running.
+    ...output omitted...
+    network connection network connection network connection Terminated
+    [student@servera ~]$
+
+
+11. Close the extra terminal. Return to the workstation system as the student user.
+[student@servera bin]$ exit
+
+
+✨lab finish processes-kill

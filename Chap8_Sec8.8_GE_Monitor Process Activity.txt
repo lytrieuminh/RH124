@@ -1,0 +1,127 @@
+#🤓 Guided Exercise: Monitor Process Activity
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start processes-monitor
+
+
+1. On the workstation machine, open two terminal windows side by side. In this section, these terminals are referred to as left and right.
+In each terminal, log in to the servera machine as the student user.
+[student@workstation ~]$ ssh student@servera
+
+2. In the left terminal shell, create the /home/student/bin directory. Create a shell script called monitor in the new directory to generate an artificial CPU load. Make the monitor script file executable.
+    2.1 Create the /home/student/bin directory.
+    [student@servera ~]$ mkdir /home/student/bin
+
+    2.2 Create the script file in the /home/student/bin directory with the content shown.
+    NOTE: The monitor script runs until the process is terminated. It generates an artificial CPU load by performing sixty thousand addition calculations.
+    After generating the CPU load, it then sleeps for one second, resets the variable, and repeats.
+
+    [student@servera ~]$ vim /home/student/bin/monitor
+    #!/bin/bash
+    while true; do
+        var=1
+        while [[ var -lt 60000 ]]; do
+            var=$(($var+1))
+        done
+        sleep 1
+    done
+
+
+    2.3 Make the monitor file executable.
+    [student@servera ~]$ chmod a+x /home/student/bin/monitor
+
+3. In the right terminal shell, run the top command. Resize the window to view the contents of the command.
+[student@servera ~]$ top
+
+4. In the left terminal shell, verify the number of logical CPUs on this virtual machine.
+[student@servera ~]$ lscpu
+
+5. In the left terminal shell, run a single instance of the monitor script file in the background.
+[student@servera ~]$ monitor &
+
+
+6. In the right terminal shell, monitor the top command. Use the l, t, and m single keystrokes to toggle the load, threads, and memory header lines.
+After observing this behavior, ensure that all headers are displayed.
+
+
+7. Note the process ID (PID) for the monitor process. View the CPU percentage for the process, which is expected to hover around 15% to 25%.
+[student@servera ~]$ top
+PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+071 student   20   0  222448   2964   2716 S  18.7   0.2   0:27.35 monitor
+...output omitted...
+
+    7.1 View the load averages. The one-minute load average value is currently less than 1. The observed value might be affected by resource contention from another virtual machine or from the virtual host.
+    top - 12:23:45 up 11 days,  1:09,  3 users,  load average: 0.21, 0.14, 0.05
+
+
+8. In the left terminal shell, run a second instance of the monitor script file in the background.
+[student@servera ~]$ monitor &
+[2] 6498
+
+
+9. In the right terminal shell, note the process ID (PID) for the second monitor process.
+View the CPU percentage for the process, which is also expected to hover between 15% to 25%.
+[student@servera ~]$ top
+ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+6071 student   20   0  222448   2964   2716 S  19.0   0.2   1:36.53 monitor
+6498 student   20   0  222448   2996   2748 R  15.7   0.2   0:16.34 monitor
+...output omitted...
+
+    9.1 Again, view the one-minute load average, which remains less than 1. Wait at least one minute for the calculation to adjust to the new workload.
+    top - 12:27:39 up 11 days,  1:13,  3 users,  load average: 0.36, 0.25, 0.11
+
+
+10. In the left terminal shell, run a third instance of the monitor script file in the background.
+[student@servera ~]$ monitor &
+[3] 6881
+
+
+11. In the right terminal shell, note the process ID (PID) for the third monitor process.
+View the CPU percentage for the process, which is again expected to hover between 15% to 25%.
+[student@servera ~]$ top
+ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+6881 student   20   0  222448   3032   2784 S  18.6   0.2   0:11.48 monitor
+6498 student   20   0  222448   2996   2748 S  15.6   0.2   0:47.86 monitor
+6071 student   20   0  222448   2964   2716 S  18.1   0.2   2:07.86 monitor
+
+    11.1 To push the load average above 1, you must start more monitor processes. The classroom setup has two CPUs, so only three processes are not enough to stress it. Start three more monitor processes in the background.
+    View again the one-minute load average, which is now expected to be above 1. Wait at least one minute for the calculation to adjust to the new workload.
+    [student@servera ~]$ monitor &
+    [4] 10708
+    [student@servera ~]$ monitor &
+    [5] 11122
+    [student@servera ~]$ monitor &
+    [6] 11338
+
+
+    top - 12:42:32 up 11 days,  1:28,  3 users,  load average: 1.23, 2.50, 1.54
+
+
+12. When you are finished observing the load average values, terminate each of the monitor processes from within the top command.
+    12.1 In the right terminal shell, press k to observe the prompt below the headers and above the columns.
+    ...output omitted...
+    PID to signal/kill [default pid = 11338]
+
+    12.2 The prompt chooses the monitor processes at the top of the list. Press Enter to kill the process.
+    ...output omitted...
+    Send pid 11338 signal [15/sigterm]
+
+    12.3 Press Enter again to confirm the SIGTERM signal 15.
+    Verify that the selected process is no longer present in the top command.
+    If the PID exists, then repeat these steps to terminate the processes, and substitute SIGKILL signal 9 when prompted.
+    6498 student   20   0  222448   2996   2748 R  22.9   0.2   5:31.47 monitor
+    6881 student   20   0  222448   3032   2784 R  21.3   0.2   4:54.47 monitor
+    11122 student   20   0  222448   2984   2736 R  15.3   0.2   2:32.48 monitor
+    6071 student   20   0  222448   2964   2716 S  15.0   0.2   6:50.90 monitor
+    10708 student   20   0  222448   3032   2784 S  14.6   0.2   2:53.46 monitor
+
+13. Repeat the previous step for each remaining monitor process. Verify that no monitor processes remain in the top command.
+
+
+14. In the right terminal shell, press q to exit the top command. Close the right terminal.
+
+
+15. Return to the workstation machine as the student user.
+[student@servera ~]$ exit
+
+
+✨lab finish processes-monitor
