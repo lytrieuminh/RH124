@@ -1,0 +1,90 @@
+#🤓 Guided Exercise: Validate Network Configuration
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start net-validate
+
+
+1. Use the ssh command to log in to servera as the student user. 
+The systems are configured to use SSH keys for authentication and passwordless access to servera.
+[student@workstation ~]$ ssh student@servera
+
+
+2. Locate the network interface name that is associated with the 52:54:00:00:fa:0a Ethernet address.
+Record or remember this name and use it to replace the enX placeholder in subsequent commands.
+❗❗❗IMPORTANT:
+Network interface names are determined by their bus type and the detection order of devices during boot.
+Your network interface names vary according to the course platform and hardware in use.
+On your system, locate the interface name (such as ens06 or en1p2) that is associated with the 52:54:00:00:fa:0a Ethernet address.
+Use this interface name to replace the enX placeholder that is used throughout this exercise.
+
+[student@servera ~]$ ip link
+
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enX: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 52:54:00:00:fa:0a brd ff:ff:ff:ff:ff:ff
+
+
+3. Display the current IP address and netmask for all interfaces.
+
+[student@servera ~]$ ip -br addr
+lo          UP          127.0.0.1/8 ::1/128
+enX:        UP          172.25.250.10/24 fe80::3059:5462:198:58b2/64
+
+
+4. Display the statistics for the enX interface.
+
+[student@servera ~]$ ip -s link show enX
+2: enX: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:00:fa:0a brd ff:ff:ff:ff:ff:ff
+    RX: bytes  packets  errors  dropped overrun mcast
+    89014225   168251   0       154418  0       0
+    TX: bytes  packets  errors  dropped carrier collsns
+    608808     6090     0       0       0       0
+
+
+
+5. Display the route information.
+
+[student@servera ~]$ ip route
+default via 172.25.250.254 dev enX proto static metric 100
+172.25.250.0/24 dev enX proto kernel scope link src 172.25.250.10 metric 100
+
+
+6. Verify that the router is accessible.
+
+[student@servera ~]$ ping -c3 172.25.250.254
+PING 172.25.250.254 (172.25.250.254) 56(84) bytes of data.
+64 bytes from 172.25.250.254: icmp_seq=1 ttl=64 time=0.196 ms
+64 bytes from 172.25.250.254: icmp_seq=2 ttl=64 time=0.436 ms
+64 bytes from 172.25.250.254: icmp_seq=3 ttl=64 time=0.361 ms
+
+--- 172.25.250.254 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 49ms
+rtt min/avg/max/mdev = 0.196/0.331/0.436/0.100 ms
+
+
+7. Show all the hops between the local system and the classroom.example.com system.
+
+[student@servera ~]$ tracepath classroom.example.com
+ 1?: [LOCALHOST]                      pmtu 1500
+ 1:  bastion.lab.example.com                               0.337ms
+ 1:  bastion.lab.example.com                               0.122ms
+ 2:  172.25.254.254                                        0.602ms reached
+     Resume: pmtu 1500 hops 2 back 2
+
+
+8. Display the listening TCP sockets on the local system.
+
+[student@servera ~]$ ss -lt
+State      Recv-Q Send-Q      Local Address:Port         Peer Address:Port
+LISTEN     0      128               0.0.0.0:sunrpc            0.0.0.0:*
+LISTEN     0      128               0.0.0.0:ssh               0.0.0.0:*
+LISTEN     0      128                  [::]:sunrpc               [::]:*
+LISTEN     0      128                  [::]:ssh                  [::]:*
+
+
+9. Return to the workstation system as the student user.
+[student@servera ~]$ exit
+
+
+✨lab finish net-validate

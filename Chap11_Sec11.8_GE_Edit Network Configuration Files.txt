@@ -1,0 +1,157 @@
+#🤓 Guided Exercise: Edit Network Configuration Files
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start net-edit
+
+
+1. On the workstation machine, use the ssh command to log in to the servera machine as the student user.
+[student@workstation ~]$ ssh student@servera
+
+
+2. Locate network interface names with the ip link command.
+❗❗❗IMPORTANT:
+Network interface names are determined by their bus type and the detection order of devices during boot.
+Your network interface names might vary according to the course platform and hardware in use.
+
+Locate the network interface name that is associated with the Ethernet address on your system. Record or remember this name, and use it to replace the en_X_ placeholder in subsequent commands.
+The active connection is called System eth0, and the configuration is in the /etc/NetworkManager/system-connections/"System eth0.nmconnection" file.
+
+[student@servera ~]$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:00:fa:0a brd ff:ff:ff:ff:ff:ff
+    altname enp0s3
+    altname ens3
+3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 8942 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether fa:16:3e:15:d4:0d brd ff:ff:ff:ff:ff:ff
+    altname enp0s4
+    altname ens4
+
+
+[student@servera ~]$ nmcli con show --active
+NAME         UUID                                  TYPE      DEVICE
+System eth0  5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0
+System eth1  9c92fad9-6ecb-3e6c-eb4d-8a47c6f50c04  ethernet  eth1
+lo           0e77d074-dd20-465e-87f5-e3974e6f42ab  loopback  lo
+
+
+[student@servera ~]$ ls /etc/NetworkManager/system-connections/
+'System eth0.nmconnection'
+
+
+3. On the servera machine, switch to the root user, and then edit the /etc/NetworkManager/system-connections/"System eth0.nmconnection" file to add the 10.0.1.1/24 address.
+    3.1 Use the sudo -i command to switch to the root user.
+
+    [student@servera ~]$ sudo -i
+    [sudo] password for student: student
+    [root@servera ~]#
+
+
+    3.2 Edit the /etc/NetworkManager/system-connections/"System eth0.nmconnection" configuration file.
+
+    Add the 10.0.1.1/24 address as the second address below the first address in the file.
+    ...output omitted...
+    [ipv4]
+    address1=172.25.250.10/24,172.25.250.254
+    address2=10.0.1.1/24
+    ...output omitted...
+
+
+4. Activate the new network address with the nmcli command.
+    4.1 Reload the configuration changes for NetworkManager to read the changes.
+    [root@servera ~]# nmcli con reload
+
+    4.2 Activate the connection with the changes.
+    [root@servera ~]# nmcli con up "System eth0"
+    Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/4)
+
+
+5. Verify that the new IP address is assigned successfully.
+[root@servera ~]# ip -br addr show eth0
+eth0             UP             172.25.250.10/24 10.0.1.1/24 fe80::5054:ff:fe00:fa0a/64
+
+
+6. Return to the workstation machine as the student user.
+[root@servera ~]# exit
+logout
+[student@servera ~]$ exit
+logout
+Connection to servera closed.
+[student@workstation ~]$
+
+
+7. On the serverb machine, edit the /etc/NetworkManager/system-connections/"System eth0.nmconnection" file to add an address of 10.0.1.2/24 and load the new configuration.
+    7.1 Log in to the serverb machine as the student user and switch to the root user.
+
+    [student@workstation ~]$ ssh student@serverb
+    ...output omitted...
+    [student@serverb ~]$ sudo -i
+    [sudo] password for student: student
+    [root@serverb ~]#
+
+
+    7.2 Edit the /etc/NetworkManager/system-connections/"System eth0.nmconnection" configuration file.
+    Add the 10.0.1.2/24 address as the second address below the first address in the file.
+
+    ...output omitted...
+    [ipv4]
+    address1=172.25.250.11/24,172.25.250.254
+    address2=10.0.1.2/24
+    ...output omitted...
+
+
+    7.3 Reload the configuration changes for NetworkManager to read the changes.
+
+    [root@serverb ~]# nmcli con reload
+
+
+    7.4 Activate the connection with the changes.
+
+    [root@serverb ~]# nmcli con up "System eth0"
+    Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/4)
+
+
+    7.5 Verify that the new IP address is assigned successfully.
+
+    [root@serverb ~]# ip -br addr show eth0
+    eth0             UP             172.25.250.11/24 10.0.1.2/24 fe80::5054:ff:fe00:fa0b/64
+
+
+8. Test connectivity between the servera and serverb machines by using the new network addresses.
+    8.1 From the serverb machine, ping the new address of the servera machine.
+
+    [root@serverb ~]# ping -c3 10.0.1.1
+    PING 10.0.1.1 (10.0.1.1) 56(84) bytes of data.
+    64 bytes from 10.0.1.1: icmp_seq=1 ttl=64 time=1.23 ms
+    64 bytes from 10.0.1.1: icmp_seq=2 ttl=64 time=0.372 ms
+    64 bytes from 10.0.1.1: icmp_seq=3 ttl=64 time=0.440 ms
+
+    --- 10.0.1.1 ping statistics ---
+    3 packets transmitted, 3 received, 0% packet loss, time 2040ms
+    rtt min/avg/max/mdev = 0.372/0.679/1.225/0.387 ms
+
+
+    8.2 Return to the workstation machine as the student user.
+
+    [root@serverb ~]# exit
+    logout
+    [student@serverb ~]$ exit
+    logout
+    Connection to serverb closed.
+    [student@workstation ~]$
+
+
+    8.3 Access the servera machine as the student user to ping the new address of the serverb machine.
+
+    [student@workstation ~]$ ssh student@servera ping -c3 10.0.1.2
+    PING 10.0.1.2 (10.0.1.2) 56(84) bytes of data.
+    64 bytes from 10.0.1.2: icmp_seq=1 ttl=64 time=0.726 ms
+    64 bytes from 10.0.1.2: icmp_seq=2 ttl=64 time=0.349 ms
+    64 bytes from 10.0.1.2: icmp_seq=3 ttl=64 time=0.342 ms
+
+    --- 10.0.1.2 ping statistics ---
+    3 packets transmitted, 3 received, 0% packet loss, time 2087ms
+    rtt min/avg/max/mdev = 0.342/0.472/0.726/0.179 ms
+
+
+✨lab  finish net-edit

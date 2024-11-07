@@ -1,0 +1,162 @@
+#🤓 Guided Exercise: Configure Hostnames and Name Resolution
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start net-hostnames
+
+
+1. Log in to servera as the student user and switch to root user.
+
+[student@workstation ~]$ ssh student@servera
+...output omitted...
+[student@testa ~]$ sudo -i
+[sudo] password for student: student
+[root@testa ~]#
+
+
+2. View the current hostname settings.
+    2.1 Display the current hostname.
+    [root@testa ~]# hostname
+    testa
+
+    2.2 Display the hostname status. The persistent, locally configured hostname is displayed in the Static hostname field.
+    The current runtime hostname, which is obtained from DHCP or DNS network services, is displayed in the Transient hostname field.
+
+    [root@testa ~]# hostnamectl status
+    Static hostname: servera.lab.example.com
+    Transient hostname: testa
+            Icon name: computer-vm
+            Chassis: vm 🖴
+            Machine ID: ace63d6701c2489ab9c0960c0f1afe1d
+            Boot ID: 03bf1d5518bd43b4a25cfe9a18d5a46a
+        Virtualization: kvm
+    Operating System: Red Hat Enterprise Linux 9.0 (Plow)
+        CPE OS Name: cpe:/o:redhat:enterprise_linux:9::baseos
+                Kernel: Linux 5.14.0-70.13.1.el9_0.x86_64
+        Architecture: x86-64
+    Hardware Vendor: Red Hat
+        Hardware Model: OpenStack Compute
+
+
+3. Set a static hostname to match the current static hostname.
+    3.1 Change the hostname and the hostname configuration file.
+    [root@testa ~]# hostnamectl hostname \
+    servera.lab.example.com
+
+    3.2 View the content of the /etc/hostname file, which provides the hostname at network start.
+    [root@testa ~]# cat /etc/hostname
+    servera.lab.example.com
+
+    3.3 Log out and log in to servera as the student user. Switch to the root user to change the command prompt to show the updated hostname.
+    
+    [root@testa ~]# exit
+    logout
+    [student@testa ~]$ exit
+    logout
+    Connection to servera closed.
+    [student@workstation ~]$ ssh student@servera
+    ...output omitted...
+    [student@servera ~]$ sudo -i
+    [sudo] password for student: student
+    [root@servera ~]#
+
+
+    3.4 Display the hostname status. The transient hostname is not shown, now that a static hostname is configured.
+
+    [root@servera ~]# hostnamectl status
+    Static hostname: servera.lab.example.com
+        Icon name: computer-vm
+            Chassis: vm
+        Machine ID: 63b272eae8d5443ca7aaa5593479b25f
+            Boot ID: ef299e0e957041ee81d0617fc98ce5ef
+    Virtualization: kvm
+    Operating System: Red Hat Enterprise Linux 9.0 (Plow)
+        CPE OS Name: cpe:/o:redhat:enterprise_linux:9::baseos
+            Kernel: Linux 5.14.0-70.el9.x86_64
+        Architecture: x86-64
+    Hardware Vendor: Red Hat
+    Hardware Model: OpenStack Compute
+
+
+4. Temporarily change the hostname to testname.
+    4.1 Change the hostname.
+    [root@servera ~]# hostname testname
+
+    4.2 Display the current hostname.
+    [root@servera ~]# hostname
+    testname
+
+
+    4.3 View the content of the /etc/hostname file, which provides the hostname at network start.
+    [root@servera ~]# cat /etc/hostname
+    servera.lab.example.com
+
+
+    4.4 Reboot the system.
+
+    [root@servera ~]# systemctl reboot
+    Connection to servera closed by remote host.
+    Connection to servera closed.
+    [student@workstation ~]$
+
+
+    4.5 Log in to servera as the student user and switch to the root user.
+
+    [student@workstation ~]$ ssh student@servera
+    ...output omitted...
+    [student@servera ~]$ sudo -i
+    [sudo] password for student: student
+    [root@servera ~]#
+
+
+    4.6 Display the current hostname.
+
+    [root@servera ~]# hostname
+    servera.lab.example.com
+
+
+5. Add class as a local nickname for the classroom server, and ensure that you can ping the server with that nickname.
+    5.1 Look up the IP address of the classroom.example.com server.
+
+    [root@servera ~]# host classroom.example.com
+    classroom.example.com has address 172.25.254.254
+
+
+    5.2 Update the /etc/hosts file to add the class server to access the 172.25.254.254 IP address.
+    The following example shows the expected content of the /etc/hosts file.
+
+    [root@servera ~]# vim /etc/hosts
+    127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+    ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+    172.25.254.254 classroom.example.com classroom class
+
+
+    5.3 Look up the IP address of the class server.
+
+    [root@servera ~]# host class
+    Host class not found: 3(NXDOMAIN)
+    [root@servera ~]# getent hosts class
+    172.25.254.254  classroom.example.com classroom class
+
+
+    5.4 Use the ping command to send packets to the class server.
+
+    [root@servera ~]# ping -c3 class
+    PING classroom.example.com (172.25.254.254) 56(84) bytes of data.
+    64 bytes from classroom.example.com (172.25.254.254): icmp_seq=1 ttl=63 time=1.21 ms
+    64 bytes from classroom.example.com (172.25.254.254): icmp_seq=2 ttl=63 time=0.688 ms
+    64 bytes from classroom.example.com (172.25.254.254): icmp_seq=3 ttl=63 time=0.559 ms
+
+    --- classroom.example.com ping statistics ---
+    3 packets transmitted, 3 received, 0% packet loss, time 2046ms
+    rtt min/avg/max/mdev = 0.559/0.820/1.214/0.283 ms
+
+
+    5.5 Return to the workstation system as the student user.
+    [root@servera ~]# exit
+    logout
+    [student@servera ~]$ exit
+    logout
+    Connection to servera closed.
+    [student@workstation ~]$
+
+
+✨lab finish net-hostnames

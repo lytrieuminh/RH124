@@ -1,0 +1,95 @@
+#Lab: Manage Networking
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start net-review
+
+
+1. Log in to the serverb machine as the student user. Switch to the root user.
+    1.1 Log in to the serverb machine as the student user and switch to the root user.
+    [student@workstation ~]$ ssh student@serverb
+    ...output omitted...
+    [student@serverb ~]$ sudo -i
+    [sudo] password for student: student
+    [root@serverb ~]#
+
+
+2. Create a connection with a static network configuration by using the settings in the table.
+
+Parameter	Setting
+Connection name	lab
+Interface name	ethX (might vary; use the interface with the 52:54:00:00:fa:0b MAC address)
+IP address	172.25.250.11/24
+Gateway address	172.25.250.254
+DNS address	172.25.250.254
+
+
+    2.1 Determine the interface name and the current active connection's name.
+    ❗❗❗IMPORTANT:
+    The name of your connection might vary according to the course platform and hardware in use.
+    The solution assumes that the interface name is eth0 and that the connection name is System eth0.
+    Locate the current connection name (such as System eth0 or Wired connection 1) that is associated with the interface in the table.
+    Use the located connection name to replace System eth0 throughout this exercise if different.
+
+
+    [root@serverb ~]# ip link
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+        link/ether 52:54:00:00:fa:0b brd ff:ff:ff:ff:ff:ff
+        altname enp0s3
+        altname ens3
+    3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 8942 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+        link/ether fa:16:3e:a1:e8:d9 brd ff:ff:ff:ff:ff:ff
+        altname enp0s4
+        altname ens4
+    [root@serverb ~]# nmcli con show --active
+    NAME         UUID                                  TYPE      DEVICE
+    System eth0  5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0
+    System eth1  9c92fad9-6ecb-3e6c-eb4d-8a47c6f50c04  ethernet  eth1
+    lo           f3266717-b049-4b7a-a37b-0b34671a1d77  loopback  lo
+
+
+
+    2.2 Create the lab connection profile based on the table information in the instructions.
+    Associate the profile with your network interface, as listed in the output of the previous ip link command.
+
+    [root@serverb ~]# nmcli con add con-name lab ifname eth0 type ethernet \
+    ipv4.method manual ipv4.dns '172.25.250.254' \
+    ipv4.addresses '172.25.250.11/24' ipv4.gateway '172.25.250.254'
+    Connection 'lab' (8321cc19-5bdf-46fb-8046-10cc4203732c) successfully added.
+
+
+3. Configure the new connection to start automatically. Other connections should not start automatically.
+[root@serverb ~]# nmcli con mod "lab" connection.autoconnect yes
+[root@serverb ~]# nmcli con mod "System eth0" connection.autoconnect no
+
+
+4. Modify the new connection to use also the 10.0.1.1/24 IP address.
+[root@serverb ~]# nmcli con mod "lab" +ipv4.addresses '10.0.1.1/24'
+[root@serverb ~]# nmcli con reload
+
+
+5. Configure the hosts file so that you can reference the 10.0.1.1 IP address with the private name.
+[root@serverb ~]# echo "10.0.1.1 private" >> /etc/hosts
+
+
+6. Reboot the system.
+[root@serverb ~]# systemctl reboot
+Connection to serverb closed by remote host.
+Connection to serverb closed.
+[student@workstation ~]$
+
+
+7. Verify that the serverb machine is initialized.
+[student@workstation ~]$ ping -c3 serverb
+PING serverb.lab.example.com (172.25.250.11) 56(84) bytes of data.
+64 bytes from serverb.lab.example.com (172.25.250.11): icmp_seq=1 ttl=64 time=0.635 ms
+64 bytes from serverb.lab.example.com (172.25.250.11): icmp_seq=2 ttl=64 time=0.432 ms
+64 bytes from serverb.lab.example.com (172.25.250.11): icmp_seq=3 ttl=64 time=0.428 ms
+
+--- serverb.lab.example.com ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2048ms
+rtt min/avg/max/mdev = 0.428/0.498/0.635/0.096 ms
+
+
+✨lab grade net-review
+✨lab finish net-review

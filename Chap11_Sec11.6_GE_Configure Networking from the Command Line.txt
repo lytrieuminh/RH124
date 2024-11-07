@@ -1,0 +1,166 @@
+#🤓 Guided Exercise: Configure Networking from the Command Line
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start net-configure
+
+
+1. Use the ssh command to log in to the servera machine as the student user.
+[student@workstation ~]$ ssh student@servera
+...output omitted...
+[student@servera ~]$ sudo -i
+[sudo] password for student: student
+[root@servera ~]#
+
+
+2. Display the network interface information.
+❗❗❗IMPORTANT:
+Network interface names are determined by their bus type and the detection order of devices during boot.
+Your network interface names might vary according to the course platform and hardware in use.
+On your system, locate the interface name (such as eth1, ens06, or enp0p2) that is associated with the Ethernet address 52:54:00:00:fa:0a.
+Use this interface name to replace the eth0 placeholder throughout this exercise if different.
+
+Locate the network interface name that is associated with the 52:54:00:00:fa:0a Ethernet address.
+Record or remember this name, and use it to replace the eth0 placeholder in subsequent commands.
+
+[root@servera ~]# ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:00:fa:0a brd ff:ff:ff:ff:ff:ff
+    altname enp0s3
+    altname ens3
+...output omitted...
+
+
+3. Use the nmcli command to view network settings.
+    3.1 Use the nmcli con show --active command to display only the active connections.
+    Your network interface name should appear under the DEVICE column of the output, and the name of the active connection for that device is listed under the NAME column.
+    This exercise assumes that the active connection is called System eth0.
+    If the name of the active connection is different, then use that name instead of System eth0 for the rest of this exercise.
+
+    [root@servera ~]# nmcli con show --active
+    NAME         UUID                                  TYPE      DEVICE
+    System eth0  5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0
+    ...output omitted...
+
+
+    3.2 Display all configuration settings for the active connection.
+    [root@servera ~]# nmcli con show "System eth0"
+
+
+    3.3 Show the device status.
+    [root@servera ~]# nmcli dev status
+
+
+    3.4 Display the settings for the eth0 device.
+    [root@servera ~]# nmcli dev show eth0
+
+
+4. Create a static connection with the same IPv4 address, network prefix, and default gateway as the active connection.
+Name the new connection static-addr.
+❌WARNING:
+Because access to your machine is provided over the primary network connection, setting incorrect values during network configuration might make your machine unreachable.
+If you machine is unreachable, then use the Reset button above what used to be your machine's graphical display and try again.
+
+[root@servera ~]# nmcli con add con-name static-addr \
+ifname eth0 type ethernet ipv4.method manual ipv4.dns 172.25.250.220 \
+ipv4.addresses 172.25.250.10/24 ipv4.gateway 172.25.250.254
+Connection 'static-addr' (3ef7c2c6-8c72-4cb6-9b19-2878e50285b1) successfully added.
+
+
+5. Display and activate the new connection.
+    5.1 View all connections.
+
+    [root@servera ~]# nmcli con show
+    NAME         UUID                                  TYPE      DEVICE
+    System eth0  5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0
+    System eth1  9c92fad9-6ecb-3e6c-eb4d-8a47c6f50c04  ethernet  eth1
+    lo           d22fdd46-f935-4212-8908-7cdd37b9f723  loopback  lo
+    static-addr  3ef7c2c6-8c72-4cb6-9b19-2878e50285b1  ethernet  --
+
+
+    5.2 View the active connections.
+
+    [root@servera ~]# nmcli con show --active
+    NAME         UUID                                  TYPE      DEVICE
+    System eth0  5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0
+    System eth1  9c92fad9-6ecb-3e6c-eb4d-8a47c6f50c04  ethernet  eth1
+    lo           d22fdd46-f935-4212-8908-7cdd37b9f723  loopback  lo
+
+
+    5.3 Activate the new static-addr connection.
+
+    [root@servera ~]# nmcli con up static-addr
+    Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/4)
+
+
+    5.4 Verify the new active connection.
+
+    [root@servera ~]# nmcli con show --active
+    NAME         UUID                                  TYPE      DEVICE
+    static-addr  3ef7c2c6-8c72-4cb6-9b19-2878e50285b1  ethernet  eth0
+    System eth1  9c92fad9-6ecb-3e6c-eb4d-8a47c6f50c04  ethernet  eth1
+    lo           d22fdd46-f935-4212-8908-7cdd37b9f723  loopback  lo
+
+
+6. Update the previous connection so that it does not start at boot.
+Verify that the static-addr connection is used when the system reboots.
+    6.1 Disable the original connection so that it does not start automatically at boot.
+
+    [root@servera ~]# nmcli con mod "System eth0" \
+    connection.autoconnect no
+
+
+    6.2 Reboot the system.
+
+    [root@servera ~]# systemctl reboot
+    Connection to servera closed by remote host.
+    Connection to servera closed.
+    [student@workstation ~]$
+
+
+    6.3 Log in to the servera machine and verify that the static-addr connection is the active connection.
+
+    [student@workstation ~]$ ssh student@servera
+    ...output omitted...
+    [student@servera ~]$ nmcli con show --active
+    NAME         UUID                                  TYPE      DEVICE
+    static-addr  3ef7c2c6-8c72-4cb6-9b19-2878e50285b1  ethernet  eth0
+    System eth1  9c92fad9-6ecb-3e6c-eb4d-8a47c6f50c04  ethernet  eth1
+    lo           6e328ad2-7ea6-411a-a0e8-b7658c71b4d7  loopback  lo
+
+
+7. Test connectivity by using the new network addresses.
+    7.1 Verify the IP address.
+
+    [student@servera ~]$ ip -br addr show eth0
+    eth0             UP             172.25.250.10/24 fe80::1be9:a14f:c8d9:8af8/64
+
+
+    7.2 Verify the default gateway.
+
+    [student@servera ~]$ ip route
+    default via 172.25.250.254 dev eth0 proto static metric 100
+    10.80.0.0/16 dev eth1 proto kernel scope link src 10.80.3.1 metric 101
+    169.254.169.254 via 10.80.0.10 dev eth1 proto dhcp src 10.80.3.1 metric 101
+    172.25.250.0/24 dev eth0 proto kernel scope link src 172.25.250.10 metric 100
+
+
+    7.3 Ping the DNS address.
+
+    [student@servera ~]$ ping -c3 172.25.250.220
+    PING 172.25.250.220 (172.25.250.220) 56(84) bytes of data.
+    64 bytes from 172.25.250.220: icmp_seq=1 ttl=64 time=0.999 ms
+    64 bytes from 172.25.250.220: icmp_seq=2 ttl=64 time=0.250 ms
+    64 bytes from 172.25.250.220: icmp_seq=3 ttl=64 time=0.293 ms
+
+    --- 172.25.250.220 ping statistics ---
+    3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+    rtt min/avg/max/mdev = 0.250/0.514/0.999/0.343 ms
+
+
+    7.4 Return to the workstation system as the student user.
+
+    [student@servera ~]$ exit
+
+
+✨lab finish net-configure
