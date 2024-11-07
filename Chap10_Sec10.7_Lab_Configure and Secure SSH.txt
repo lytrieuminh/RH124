@@ -1,0 +1,162 @@
+#Lab: Configure and Secure SSH
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start ssh-review
+
+
+1. From the workstation machine, log in to the servera machine as the student user.
+[student@workstation ~]$ ssh student@servera
+
+
+2. Switch to the production1 user on the servera machine. Enter redhat as the password.
+[student@servera ~]$ su - production1
+Password: redhat
+[production1@servera ~]$
+
+
+3. Generate passphrase-less SSH keys for the production1 user on the servera machine.
+[production1@servera ~]$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/production1/.ssh/id_rsa): Enter
+Created directory '/home/production1/.ssh'.
+Enter passphrase (empty for no passphrase): Enter
+Enter same passphrase again: Enter
+Your identification has been saved in /home/production1/.ssh/id_rsa.
+Your public key has been saved in /home/production1/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:MCQ8nXClDFSlJV0i5IouUzlzFrbsdz+jO8ZIMeSTOuQ production1@servera.lab.example.com
+The key's randomart image is:
++---[RSA 3072]----+
+|   o==B==..      |
+|    oB+*..      |
+|    o+B.         |
+|   =.+*o         |
+|  *o*. +S        |
+| o *E .          |
+|o . .o.o.        |
+| o   ...+.o      |
+|       .o+.o     |
++----[SHA256]-----+
+
+
+4. Send the public key of the SSH key pair to the production1 user on the serverb machine.
+
+[production1@servera ~]$ ssh-copy-id production1@serverb
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/production1/.ssh/id_rsa.pub"
+The authenticity of host 'serverb (172.25.250.11)' can't be established.
+ED25519 key fingerprint is SHA256:h/hEJa/anxp6AP7BmB5azIPVbPNqieh0oKi4KWOTK80.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+production1@serverb's password: redhat
+Number of key(s) added: 1
+
+Now try logging in to the machine, with:   "ssh 'production1@serverb'"
+and check to make sure that only the key(s) you wanted were added.
+
+
+5. Verify that the production1 user can successfully log in to the serverb machine with the SSH keys.
+
+[production1@servera ~]$ ssh production1@serverb
+...output omitted...
+[production1@serverb ~]$
+
+
+6. Configure the sshd service on serverb to prevent users from logging in as the root user. Use redhat as the root password.
+    6.1 Switch to the root user on the serverb machine.
+    [production1@serverb ~]$ su -
+    Password: redhat
+    [root@serverb ~]#
+
+    6.2 Set the PermitRootLogin parameter to no in the /etc/ssh/sshd_config file and reload the sshd service.
+    Edit the active uncommented parameter and not a commented example.
+    ...output omitted...
+    PermitRootLogin no
+    ...output omitted...
+    [root@serverb ~]# systemctl reload sshd.service
+
+    6.3 Open another terminal on the workstation machine and log in to the servera machine as the production1 user.
+    From servera, try to log in to the serverb machine as the root user. This command should fail, because you disabled SSH root user login.
+    The command exited after three failed attempts to log in to the servera machine as the root user.
+    By default, the ssh command prefers to use SSH keys for authentication, and if it does not find the necessary keys of the user, then it requests the user's password for authentication.
+
+    NOTE:
+    For course convenience, the password-less root login is already configured between workstation and servera in the classroom environment.
+    However, this configuration is highly insecure, and is not recommended for any production environment.
+
+    [student@workstation ~]$ ssh production1@servera
+    ...output omitted...
+    [production1@servera ~]$ ssh root@serverb
+    root@serverb's password: redhat
+    Permission denied, please try again.
+    root@serverb's password: redhat
+    Permission denied, please try again.
+    root@serverb's password: redhat
+    root@serverb: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
+    [production1@servera ~]$
+
+
+7. Configure the sshd service on the serverb machine to allow users to authenticate with SSH keys only, rather than with their passwords.
+    7.1 Return to the first terminal with the root active shell on the serverb machine.
+    Set the PasswordAuthentication parameter to no in the /etc/ssh/sshd_config file and reload the sshd service.
+    Edit the active uncommented parameter and not a commented example.
+
+    ...output omitted...
+    PasswordAuthentication no
+    ...output omitted...
+    [root@serverb ~]# systemctl reload sshd
+
+
+    7.2 Go to the second terminal with the production1 active shell on the servera machine, and try to log in to the serverb machine as the production2 user.
+    This command should fail, because SSH keys are not configured for the production2 user, and the sshd service on the serverb machine does not allow the use of passwords for authentication.
+
+    [production1@servera ~]$ ssh production2@serverb
+    production2@serverb: Permission denied (publickey,gssapi-keyex,gssapi-with-mic).
+
+    NOTE:
+    For more granularity, you can use the explicit ssh command -o PubkeyAuthentication=no and -o PasswordAuthentication=yes options.
+    With these options, you can override the ssh command defaults, and confidently establish whether the preceding command failed based on the settings that you adjusted in the /etc/ssh/sshd_config file in the preceding step.
+
+
+    7.3 Return to the first terminal with the root active shell on the serverb machine.
+    Verify that PubkeyAuthentication is enabled in the /etc/ssh/sshd_config file.
+
+    [root@serverb ~]$ cat /etc/ssh/sshd_config
+    ...output omitted...
+    #PubkeyAuthentication yes
+    ...output omitted...
+
+    NOTE:
+    The PubkeyAuthentication line is commented. Commented lines indicate the default values of a parameter.
+    The public key authentication of SSH is active by default, as the commented line indicates.
+
+
+    7.4 Return to the second terminal with the production1 active shell on the servera machine, and try to log in to the serverb machine as the production1 user.
+    This command should succeed, because SSH keys are configured for the production1 user to log in to the serverb machine from the servera machine.
+
+    [production1@servera ~]$ ssh production1@serverb
+
+    7.5 Exit and close the extra terminal.
+    [production1@serverb ~]$ exit
+    logout
+    Connection to serverb closed.
+    [production1@servera ~]$ exit
+    logout
+    [student@workstation ~]$ exit
+
+
+    7.6 Return to the workstation system as the student user.
+    [root@serverb ~]# exit
+    logout
+    [production1@serverb ~]$ exit
+    logout
+    Connection to serverb closed.
+    [production1@servera ~]$ exit
+    logout
+    [student@servera ~]$ exit
+    logout
+    Connection to servera closed.
+    [student@workstation ~]$
+
+
+✨lab grade ssh-review
+✨lab finish ssh-review

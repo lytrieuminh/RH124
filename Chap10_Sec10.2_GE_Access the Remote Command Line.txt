@@ -1,0 +1,106 @@
+#🤓 Guided Exercise: Access the Remote Command Line
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start ssh-access
+
+
+1. From workstation, open an SSH session to the servera machine as the student user.
+[student@workstation ~]$ ssh student@servera
+
+
+2. Open an SSH session to the serverb machine as the student user. Accept the host key.
+Use student as the password when prompted for the password of the student user on the serverb machine.
+[student@servera ~]$ ssh student@serverb
+
+NOTE:
+The ssh command records the host key on the /home/student/.ssh/known_hosts file in the servera machine to identify the serverb machine.
+The student user initiated the SSH connection from the servera machine.
+If the /home/student/.ssh/known_hosts file does not exist, then it is created along with the new entry in it.
+The ssh command fails to execute correctly if the remote host appears to have a different key from the recorded key.
+
+
+3. Display the users that are currently logged in to the serverb machine. The student user is logged in to the system from the host with an IP address of 172.25.250.10, which is the servera machine in the classroom network.
+[student@serverb ~]$ w --from
+03:39:04 up 16 min,  1 user,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+student  pts/0    172.25.250.10    20:40    1.00s  0.01s  0.00s w --from
+
+
+4. Exit the student user's shell on the serverb machine.
+[student@serverb ~]$ exit
+logout
+Connection to serverb closed.
+[student@servera ~]$
+
+
+5. Open an SSH session to the serverb machine as the root user. Use redhat as the password of the root user. The command did not ask you to accept the host key, because it was found among the known hosts.
+If the identity of the serverb machine changes, then OpenSSH prompts you to challenge the new host key.
+[student@servera ~]$ ssh root@serverb
+root@serverb's password: redhat
+...output omitted...
+[root@serverb ~]#
+
+
+6. Run the w command to display the users that are currently logged in to the serverb machine.
+The output indicates that the root user is logged in to the system from the host with an IP address of 172.25.250.10, which is the servera machine in the classroom network.
+[root@serverb ~]# w --from
+03:46:05 up 23 min,  1 user,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+root     pts/0    172.25.250.10    20:44    1.00s  0.02s  0.00s w --from
+
+
+7. Exit the root user's shell on the serverb machine.
+[root@serverb ~]# exit
+logout
+Connection to serverb closed.
+[student@servera ~]$
+
+
+8. Remove the /home/student/.ssh/known_hosts file from the servera machine.
+This operation causes ssh to lose the recorded identities of the remote systems.
+[student@servera ~]$ rm /home/student/.ssh/known_hosts
+
+NOTE:
+Host keys can change for legitimate reasons: perhaps the remote machine was replaced because of a hardware failure, or the remote machine was reinstalled.
+Usually, it is advisable to remove the key entry only for the particular host in the known_hosts file.
+Because this particular known_hosts file has only one entry, you can remove the entire file.
+
+
+9. Open an SSH session to the serverb machine as the student user. If asked, accept the host key. Use student when prompted for the password of the student user on the serverb machine.
+[student@servera ~]$ ssh student@serverb
+The authenticity of host 'serverb (172.25.250.11)' can't be established.
+ED25519 key fingerprint is SHA256:h/hEJa/anxp6AP7BmB5azIPVbPNqieh0oKi4KWOTK80.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'serverb' (ED25519) to the list of known hosts.
+student@serverb's password: student
+...output omitted...
+[student@serverb ~]$
+
+
+10. Exit the student user's shell on the serverb machine, and confirm that a new instance of the known_hosts file exists on the servera machine.
+[student@serverb ~]$ exit
+logout
+Connection to serverb closed.
+[student@servera ~]$ ls -l /home/student/.ssh/known_hosts
+-rw-------. 1 student student 819 Mar 24 03:47 /home/student/.ssh/known_hosts
+
+
+11. Confirm that the new instance of the known_hosts file has the host key of the serverb machine.
+The following command output is an example; your workstation output might differ.
+[student@servera ~]$ cat /home/student/.ssh/known_hosts
+...output omitted...
+serverb ecdsa-sha2-nistp256 AAAAB3NzaC1yc2EAAAADAQ...
+...output omitted...
+
+
+12. Run the hostname command remotely on the serverb machine without accessing the interactive shell.
+[student@servera ~]$ ssh student@serverb hostname
+student@serverb's password: student
+serverb.lab.example.com
+
+
+13. Return to the workstation system as the student user.
+[student@servera ~]$ exit
+
+
+✨lab finish ssh-access

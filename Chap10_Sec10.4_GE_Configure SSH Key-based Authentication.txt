@@ -1,0 +1,240 @@
+#🤓 Guided Exercise: Configure SSH Key-based Authentication
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start ssh-configure
+
+
+1. Log in to the serverb machine as the student user.
+[student@workstation ~]$ ssh student@serverb
+
+
+2. Switch to the operator1 user on the serverb machine. Use redhat as the password.
+[student@serverb ~]$ su - operator1
+Password: redhat
+[operator1@serverb ~]$
+
+
+3. Generate a set of SSH keys. Do not enter a passphrase.
+
+[operator1@serverb ~]$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/operator1/.ssh/id_rsa): Enter
+Created directory '/home/operator1/.ssh'.
+Enter passphrase (empty for no passphrase): Enter
+Enter same passphrase again: Enter
+Your identification has been saved in /home/operator1/.ssh/id_rsa.
+Your public key has been saved in /home/operator1/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:JainiQdnRosC+xXh operator1@serverb.lab.example.com
+The key's randomart image is:
++---[RSA 3072]----+
+|E+*+ooo .        |
+|.= o.o o .       |
+|o.. = . . o      |
+|+. + * . o .     |
+|+ = X . S +      |
+| + @ +   = .     |
+|. + =   o        |
+|.o . . . .       |
+|o     o..        |
++----[SHA256]-----+
+
+
+4. Send the public key of the SSH key pair to the operator1 user on the servera machine, with redhat as the password.
+
+[operator1@serverb ~]$ ssh-copy-id operator1@servera
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/operator1/.ssh/id_rsa.pub"
+The authenticity of host 'servera (172.25.250.10)' can't be established.
+ED25519 key fingerprint is SHA256:h/hEJa/anxp6AP7BmB5azIPVbPNqieh0oKi4KWOTK80.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+operator1@servera's password: redhat
+
+Number of key(s) added: 1
+
+Now try logging in to the machine, with:   "ssh 'operator1@servera'"
+and check to make sure that only the key(s) you wanted were added.
+
+
+5. Execute the hostname command on the servera machine remotely by using the ssh command without accessing the remote interactive shell.
+
+[operator1@serverb ~]$ ssh operator1@servera hostname
+servera.lab.example.com
+
+NOTE:
+    5.1 The preceding ssh command does not prompt you for a password, because it uses the passphrase-less private key against the exported public key to authenticate as the operator1 user on the servera machine.
+    5.2 This approach is not secure, because anyone who has access to the private key file can log in to the servera machine as the operator1 user.
+    5.3 In a following step in this exercise, you make your private key more secure by encrypting it and protecting access to it by adding a passphrase.
+
+
+6. Generate another set of SSH keys with the default name and without a passphrase, and overwrite the previously generated SSH key files.
+Try to connect to the servera machine by using the new SSH keys. The ssh command asks for a password, because it cannot authenticate with the SSH key.
+Run again the ssh command with the -v (verbose) option to verify it.
+
+Send the new public key of the SSH key pair to the operator1 user on the servera machine, to replace the previous public key.
+Use redhat as the password for the operator1 user on the servera machine.
+Execute the hostname command on the servera machine remotely by using the ssh command without accessing the remote interactive shell, to verify that it works again.
+    
+    6.1 Again, generate another set of SSH keys with the default name and without a passphrase, and overwrite the previously generated SSH key files.
+    
+    [operator1@serverb ~]$ ssh-keygen
+    Generating public/private rsa key pair.
+    Enter file in which to save the key (/home/operator1/.ssh/id_rsa): Enter
+    /home/operator1/.ssh/id_rsa already exists.
+    Overwrite (y/n)? y
+    Enter passphrase (empty for no passphrase): Enter
+    Enter same passphrase again: Enter
+    Your identification has been saved in /home/operator1/.ssh/id_rsa
+    Your public key has been saved in /home/operator1/.ssh/id_rsa.pub
+    ...output omitted...
+
+
+    6.2 Try to connect to the servera machine by using the new SSH keys. The ssh command asks for a password, because it cannot authenticate with the SSH key.
+    Press Ctrl+c to exit from the ssh command when it prompts for a password.
+    Run again the ssh command with the -v (verbose) option to verify it.
+    Press again Ctrl+c to exit from the ssh command when it prompts for a password.
+    
+    [operator1@serverb ~]$ ssh operator1@servera hostname
+    operator1@servera's password: ​^C
+    [operator1@serverb ~]$ ssh -v operator1@servera hostname
+    OpenSSH_8.7p1, OpenSSL 3.0.1 14 Dec 2021
+    debug1: Reading configuration data /etc/ssh/ssh_config
+    debug1: Reading configuration data /etc/ssh/ssh_config.d/01-training.conf
+    ...output omitted...
+    debug1: Next authentication method: publickey
+    debug1: Offering public key: /home/operator1/.ssh/id_rsa RSA SHA256:ad597Zf64xckV26xht8bjQbzqSPuOXQPXksGEWVsP80
+    debug1: Authentications that can continue: publickey,gssapi-keyex,gssapi-with-mic,password
+    debug1: Trying private key: /home/operator1/.ssh/id_dsa
+    debug1: Trying private key: /home/operator1/.ssh/id_ecdsa
+    debug1: Trying private key: /home/operator1/.ssh/id_ecdsa_sk
+    debug1: Trying private key: /home/operator1/.ssh/id_ed25519
+    debug1: Trying private key: /home/operator1/.ssh/id_ed25519_sk
+    debug1: Trying private key: /home/operator1/.ssh/id_xmss
+    debug1: Next authentication method: password
+    operator1@servera's password: ​^C
+
+
+    6.3 Send the new public key of the SSH key pair to the operator1 user on the servera machine, to replace the previous public key.
+    Use redhat as the password for the operator1 user on the servera machine.
+    Execute the hostname command on the servera machine remotely by using the ssh command without accessing the remote interactive shell, to verify that it works again.
+    
+    [operator1@serverb ~]$ ssh-copy-id operator1@servera
+    ...output omitted...
+    operator1@servera's password: redhat
+
+    Number of key(s) added: 1
+
+    Now try logging in to the machine, with:   "ssh 'operator1@servera'"
+    and check to make sure that only the key(s) you wanted were added.
+    [operator1@serverb ~]$ ssh operator1@servera hostname
+    servera.lab.example.com
+
+
+7. Generate another set of SSH keys with passphrase-protection.
+Save the key as /home/operator1/.ssh/key2. Use redhatpass as the passphrase of the private key.
+
+[operator1@serverb ~]$ ssh-keygen -f .ssh/key2
+Generating public/private rsa key pair.
+Enter passphrase (empty for no passphrase): redhatpass
+Enter same passphrase again: redhatpass
+Your identification has been saved in .ssh/key2.
+Your public key has been saved in .ssh/key2.pub.
+The key fingerprint is:
+SHA256:OCtCjfPm5QrbPBgqb operator1@serverb.lab.example.com
+The key's randomart image is:
++---[RSA 3072]----+
+|O=X*             |
+|OB=.             |
+|E*o.             |
+|Booo   .         |
+|..= . o S        |
+| +.o   o         |
+|+.oo+ o          |
+|+o.O.+           |
+|+ . =o.          |
++----[SHA256]-----+
+
+
+8. Send the public key of the passphrase-protected key pair to the operator1 user on the servera machine.
+The command does not prompt you for a password, because it uses the public key of the passphrase-less private key that you exported to the servera machine in the preceding step.
+
+[operator1@serverb ~]$ ssh-copy-id -i .ssh/key2.pub operator1@servera
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: ".ssh/key2.pub"
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+
+Number of key(s) added: 1
+
+Now try logging in to the machine, with:   "ssh 'operator1@servera'"
+and check to make sure that only the key(s) you wanted were added.
+
+
+9. Execute the hostname command on the servera machine remotely by using the ssh command.
+Use the /home/operator1/.ssh/key2 key as the identity file. Specify redhatpass as the passphrase, which you set for the private key in the preceding step.
+
+NOTE:
+The command prompts you for the passphrase that you used to protect the private key of the SSH key pair.
+If an attacker gains access to the private key, then the attacker cannot use it to access other systems, because a passphrase protects the private key itself.
+The ssh command uses a different passphrase from the operator1 user on the servera machine, and so users must know both passphrases.
+
+[operator1@serverb ~]$ ssh -i .ssh/key2 operator1@servera hostname
+Enter passphrase for key '.ssh/key2': redhatpass
+servera.lab.example.com
+
+NOTE:
+Use the ssh-agent program, as in the following step, to avoid interactively typing the passphrase when logging in with SSH.
+Using the ssh-agent program is both more convenient and more secure when the administrators log in to remote systems regularly.
+
+
+10. Run the ssh-agent program in your Bash shell, and add the passphrase-protected private key (/home/operator1/.ssh/key2) of the SSH key pair to the shell session.
+The command starts the ssh-agent program and configures the shell session to use it. Then, you use the ssh-add command to provide the unlocked private key to the ssh-agent program.
+
+[operator1@serverb ~]$ eval $(ssh-agent)
+Agent pid 1729
+[operator1@serverb ~]$ ssh-add .ssh/key2
+Enter passphrase for .ssh/key2: redhatpass
+Identity added: .ssh/key2 (operator1@serverb.lab.example.com)
+
+
+11. Execute the hostname command on the servera machine remotely without accessing a remote interactive shell.
+Use the /home/operator1/.ssh/key2 key as the identity file.
+The command does not prompt you to enter the passphrase interactively.
+
+[operator1@serverb ~]$ ssh -i .ssh/key2 operator1@servera hostname
+servera.lab.example.com
+
+
+12. Open another terminal on the workstation machine and log in to the serverb machine as the student user.
+[student@workstation ~]$ ssh student@serverb
+
+
+13. On the serverb machine, switch to the operator1 user and remotely log in to the servera machine.
+Use the /home/operator1/.ssh/key2 key as the identity file to authenticate by using the SSH keys.
+    13.1 Use the su command to switch to the operator1 user. Use redhat as the password for the operator1 user.
+    [student@serverb ~]$ su - operator1
+    Password: redhat
+    [operator1@serverb ~]$
+
+    13.2 Log in to the servera machine as the operator1 user.
+    The command prompts you to enter the passphrase interactively, because you do not invoke the SSH connection from the same shell where you started the ssh-agent program.
+    [operator1@serverb ~]$ ssh -i .ssh/key2 operator1@servera
+    Enter passphrase for key '.ssh/key2': redhatpass
+    ...output omitted...
+    [operator1@servera ~]$
+
+
+14. Exit and close all extra terminals, and return to the workstation machine.
+    14.1 Exit and close extra terminal windows. The exit commands leave the operator1 user's shell; terminate the shell session where ssh-agent is active; and return to the student user's shell on the serverb machine.
+    [operator1@servera ~]$ exit
+
+    14.2 Return to the workstation system as the student user.
+    [operator1@serverb ~]$ exit
+    logout
+    [student@serverb ~]$ exit
+    logout
+    Connection to serverb closed.
+    [student@workstation ~]$
+
+
+✨lab finish ssh-configure

@@ -1,0 +1,203 @@
+#🤓 Guided Exercise: Customize OpenSSH Service Configuration
+#🐱‍🚀🐱‍👤🐱‍💻🐱‍🐉🐱‍👓🐱‍🏍✨
+[student@workstation ~]$ lab start ssh-customize
+
+
+1. From workstation, open an SSH session to the serverb machine as the student user.
+[student@workstation ~]$ ssh student@serverb
+
+
+2. Use the su command to switch to the operator2 user on the serverb machine. Use redhat as the password for the operator2 user.
+[student@serverb ~]$ su - operator2
+Password: redhat
+[operator2@serverb ~]$
+
+
+3. Use the ssh-keygen command to generate SSH keys. Do not enter any passphrase for the keys.
+
+[operator2@serverb ~]$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/operator2/.ssh/id_rsa): Enter
+Created directory '/home/operator2/.ssh'.
+Enter passphrase (empty for no passphrase): Enter
+Enter same passphrase again: Enter
+Your identification has been saved in /home/operator2/.ssh/id_rsa.
+Your public key has been saved in /home/operator2/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:LN5x1irX0OWxgyd/qhATNgZWOtLUj16EZkM1JHkCR+I operator2@serverb.lab.example.com
+The key's randomart image is:
++---[RSA 3072]----+
+|        *=+      |
+|       = =O.o.   |
+|      . Eo=B  o  |
+|       o +.=o+ o |
+|      . S..= =  |
+|     . o +. + . |
+|      . o + . . .|
+|         o .   o |
+|            ...  |
++----[SHA256]-----+
+
+
+4. Use the ssh-copy-id command to send the public key of the SSH key pair to the operator2 user on the servera machine.
+Use redhat as the password for the operator2 user on servera.
+
+[operator2@serverb ~]$ ssh-copy-id operator2@servera
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/operator2/.ssh/id_rsa.pub"
+The authenticity of host 'servera (172.25.250.10)' can't be established.
+ED25519 key fingerprint is SHA256:h/hEJa/anxp6AP7BmB5azIPVbPNqieh0oKi4KWOTK80.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+operator2@servera's password: redhat
+Number of key(s) added: 1
+Now try logging into the machine, with:   "ssh 'operator2@servera'"
+and check to make sure that only the key(s) you wanted were added.
+
+
+5. Confirm that you can successfully log in to the servera machine as the operator2 user with the SSH keys.
+    5.1 Open an SSH session to the servera machine as the operator2 user.
+    [operator2@serverb ~]$ ssh operator2@servera
+
+    NOTE:
+    The preceding ssh command used SSH keys for authentication.
+
+    5.2 Log out of the servera machine.
+    [operator2@servera ~]$ exit
+    logout
+    Connection to servera closed.
+
+
+6. Confirm that you can successfully log in to the servera machine as the root user with redhat as the password.
+    6.1 Open an SSH session to the servera machine as the root user with redhat as the password.
+    [operator2@serverb ~]$ ssh root@servera
+    root@servera's password: redhat
+    ...output omitted...
+    [root@servera ~]#
+
+    NOTE:
+    The preceding ssh command used the password of the superuser for authentication, because SSH keys do not exist for the superuser.
+
+
+    6.2 Log out of the servera machine.
+    [root@servera ~]# exit
+
+
+7. Confirm that you can successfully log in to the servera machine as the operator3 user with redhat as the password.
+    7.1 Open an SSH session to the servera machine as the operator3 user with redhat as the password.
+    [operator2@serverb ~]$ ssh operator3@servera
+    operator3@servera's password: redhat
+    ...output omitted...
+    [operator3@servera ~]$
+
+    NOTE:
+    The preceding ssh command used the password of the operator3 user for authentication, because SSH keys do not exist for the operator3 user.
+
+    7.2 Log out of the servera machine.
+    [operator3@servera ~]$ exit
+
+
+8. Configure the sshd service on the servera machine to prevent users from logging in as the root user. Use redhat as the password of the superuser when required.
+    8.1 Open an SSH session to the servera machine as the operator2 user with the SSH keys.
+    [operator2@serverb ~]$ ssh operator2@servera
+
+    8.2 On the servera machine, switch to the root user. Use redhat as the password for the root user.
+    [operator2@servera ~]$ su -
+    Password: redhat
+    [root@servera ~]#
+
+    8.3 Set PermitRootLogin to no in the /etc/ssh/sshd_config file and reload the sshd service.
+    You can use the vim /etc/ssh/sshd_config command to edit the configuration file of the sshd service.
+    ...output omitted...
+    PermitRootLogin no
+    ...output omitted...
+    [root@servera ~]# systemctl reload sshd
+
+
+    8.4 Open another terminal on workstation, and open an SSH session to the serverb machine as the operator2 user.
+    From the serverb machine, try to log in to the servera machine as the root user.
+    This command should fail, because you disabled the root user login over SSH in the preceding step.
+
+    NOTE:
+    For your convenience, password-less login is already configured between workstation and serverb in the classroom environment.
+
+    [student@workstation ~]$ ssh operator2@serverb
+    ...output omitted...
+    [operator2@serverb ~]$ ssh root@servera
+    root@servera's password: redhat
+    Permission denied, please try again.
+    root@servera's password: redhat
+    Permission denied, please try again.
+    root@servera's password: redhat
+    root@servera: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
+
+    NOTE:
+    By default, the ssh command attempts to authenticate with key-based authentication first, and if that method fails, then with password-based authentication.
+
+
+9. Configure the sshd service on the servera machine to allow users to authenticate with SSH keys only, rather than with their passwords.
+    9.1 Return to the first terminal with the root user's active shell on the servera machine.
+    Set the PasswordAuthentication parameter to no in the /etc/ssh/sshd_config file and reload the sshd service.
+    You can use the vim /etc/ssh/sshd_config command to edit the configuration file of the sshd service.
+    ...output omitted...
+    PasswordAuthentication no
+    ...output omitted...
+    [root@servera ~]# systemctl reload sshd
+
+
+    9.2 Go to the second terminal with the operator2 user's active shell on the serverb machine, and try to log in to the servera machine as the operator3 user.
+    This command should fail, because SSH keys are not configured for the operator3 user, and the sshd service on the servera machine does not allow the use of passwords for authentication.
+    
+    [operator2@serverb ~]$ ssh operator3@servera
+    operator3@servera: Permission denied (publickey,gssapi-keyex,gssapi-with-mic).
+
+    NOTE:
+    For more granularity, you can use the explicit -o PubkeyAuthentication=no and -o PasswordAuthentication=yes options with the ssh command.
+    You can then override the ssh command's defaults and confidently determine that the preceding command fails based on the settings that you adjusted in the /etc/ssh/sshd_config file in the preceding step. 
+
+    9.3 Return to the first terminal with the root user's active shell on the servera machine.
+    Verify that PubkeyAuthentication is enabled in the /etc/ssh/sshd_config file.
+    You can use the vim /etc/ssh/sshd_config command to view the configuration file of the sshd service.
+
+    ...output omitted...
+    #PubkeyAuthentication yes
+    ...output omitted...
+
+    NOTE:
+    The PubkeyAuthentication line is commented. Commented lines indicate the default values of a parameter.
+    The public key authentication of SSH is active by default, as the commented line indicates.
+
+    9.4 Return to the second terminal with the operator2 user's active shell on the serverb machine, and try to log in to the servera machine as the operator2 user.
+    This command should succeed, because the SSH keys are configured for the operator2 user to log in to the servera machine from the serverb machine.
+    [operator2@serverb ~]$ ssh operator2@servera
+    ...output omitted...
+    [operator2@servera ~]$
+
+    9.5 From the second terminal, exit the operator2 user's shell on both the servera and serverb machines.
+    [operator2@servera ~]$ exit
+    logout
+    Connection to servera closed.
+    [operator2@serverb ~]$ exit
+    logout
+    Connection to serverb closed.
+    [student@workstation ~]$
+
+    9.6 Close the second terminal on the workstation machine.
+    [student@workstation ~]$ exit
+
+    9.7 From the first terminal, exit the root user's shell on the servera machine.
+    [root@servera ~]# exit
+
+    9.8 From the first terminal, exit the operator2 user's shell on both the servera and serverb machines.
+    [operator2@servera ~]$ exit
+    logout
+    Connection to servera closed.
+    [operator2@serverb ~]$ exit
+    logout
+    [student@serverb ~]$
+
+    9.9 Log out of serverb, and return to the student user's shell on workstation.
+    [student@serverb ~]$ exit
+
+
+✨lab finish ssh-customize
