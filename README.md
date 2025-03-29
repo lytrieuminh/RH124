@@ -3,7 +3,7 @@
 ● I have studied this course since 2024-2025.\
 ● Thank you for visiting! 🤓
 
-P.S. Due to the requirements of security  and  privacy  regulations for the study path and study platform, I am unable to make all the course contents public.
+P.S. Due to the requirements of security  and  privacy  regulations for the study path and study platform, I am unable to make all course contents public.
 I hope this does not cause you any inconvenience.
 
 &emsp;Minh Ly
